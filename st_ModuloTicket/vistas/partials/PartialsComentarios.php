@@ -18,6 +18,7 @@ class PartialsComentarios extends Pagina {
               $i=0;
               //while($comentario = mysqli_fetch_array($comentarios)){
               for($i==0;$i<count($comentario); $i++){
+                  //var_dump($comentario[$i]['tipo_id']);
                   $fecha[$i] = $this->FormatoFecha($comentario[$i]['fechaRegistro']);
                   if($i==0){                  
                   ?>
@@ -47,7 +48,7 @@ class PartialsComentarios extends Pagina {
                   ?>
                         <!-- timeline item -->
             <li>
-              <i class="fa fa-user <?php echo $fa=($comentario[$i]['tipo_id']=='1'?'bg-orange':'bg-blue')?>"></i>
+              <i class="fa fa-user <?php echo $fa=($comentario[$i]['tipo_id']==1?'bg-orange':'bg-blue')?>"></i>
 
               <div class="timeline-item">
                   <span class="time"><i class="fa fa-clock-o"></i> <?php echo substr($comentario[$i]['fechaRegistro'], 11,5)?></span>
@@ -55,7 +56,7 @@ class PartialsComentarios extends Pagina {
                   <h3 class="timeline-header"><a href="#"><?php echo $comentario[$i]['nombre']." ".utf8_encode($comentario[$i]['apellido'])?></a> comentó</h3>
 
                 <div class="timeline-body">
-                    <?php echo utf8_encode($comentario[$i]['comentario'])?>
+                    <?php echo html_entity_decode(stripslashes($comentario[$i]['comentario']))?>
                 </div>
                 <!--    
                 <div class="timeline-footer">

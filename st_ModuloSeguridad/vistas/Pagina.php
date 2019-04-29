@@ -29,8 +29,7 @@ class Pagina
   <link rel="stylesheet" href="../st_includes/dist/css/skins/_all-skins.min.css">
   
   <!-- Estilos personalizados -->
-  <link rel="stylesheet" href="../st_includes/css/estilos.css">
-  
+  <link rel="stylesheet" href="../st_includes/css/estilos.css">  
   
     <?php    
         if($data['js']=="tabla-dinamica"){
@@ -170,6 +169,14 @@ class Pagina
             </span>
           </a>
         </li>
+        <li class="<?php echo $dataUser['menu']=='CartasDeGarantia'?'active':'' ?>">
+          <a href="../st_ModuloCartasDeGarantia/">
+            <i class="fa fa-files-o"></i> <span>Cartas de Garantía</span>
+            <span class="pull-right-container">
+              <!--<small class="label pull-right bg-green">new</small>-->
+            </span>
+          </a>
+        </li>         
 
 
       </ul>
@@ -185,11 +192,11 @@ class Pagina
             ?>
   <footer class="main-footer">
     <div class="pull-right hidden-xs">
-      <b>Version</b> 2.4.0
+      <b>Version</b> 0.1
     </div>
-    <strong>Copyright &copy; 2014-2016 <a href="https://adminlte.io">Almsaeed Studio</a>.</strong> All rights
+    <strong>Copyright &copy; 2019 <a href="http://www.aliada.com.pe/">Aliada</a>.</strong> All rights
     reserved.
-  </footer>            
+  </footer>           
             <?php
 
 	}
@@ -207,39 +214,34 @@ class Pagina
 
 
 
-<?php if($data['js']!="jstree"){
+<?php 
+    $response = strpos($data['js'], "jstree");
+    if($response===FALSE){
     ?>
 <!-- -->
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
-        <?php
-}
-?>
-
 <!-- jQuery 3 ---
 <script src="../st_includes/bower_components/jquery/dist/jquery.min.js"></script>-->
+        <?php
+}
+        $response = strpos($data['js'], 'datepciker');
+        if($response!==FALSE){
+            ?>
+<script src="../st_includes/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js"></script>                
+                <?php
+        }
+  ?>
 
 <!-- Bootstrap 3.3.7 -->
 <script src="../st_includes/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 <!-- FastClick --
 <script src="../st_includes/bower_components/fastclick/lib/fastclick.js"></script>-->
 
-
 <!-- SlimScroll -->
 <script src="../st_includes/bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
-
-<script>
-//$.noConflict();
-//$("li.user-menu").on("click",function(){          
-//    $(this).addClass("open");          
-//});
-
-
-//$(".sidebar-toggle").on("click",function(){
-//    $("body.sidebar-mini").addClass('sidebar-collapse');
-//});
-</script>
     <?php        
-        if($data['js']=='select2'){
+        $response = strpos($data['js'],'select2');
+        if($response!==FALSE){
             ?>
 <!-- Latest compiled and minified JavaScript --->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.7/dist/js/bootstrap-select.min.js"></script>
@@ -247,8 +249,8 @@ class Pagina
 <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.7/dist/js/i18n/defaults-*.min.js"></script>-->
                 <?php
         }
-        
-        if($data['js']=='tabla-dinamica'){
+        $response = strpos($data['js'],'tabla-dinamica');
+        if($response!==FALSE){
             ?>
 <!-- DataTables -->
 <script src="../st_includes/bower_components/datatables.net/js/jquery.dataTables.min.js"></script>
@@ -1131,6 +1133,7 @@ class Pagina
         
         public function FormatoFecha($fecha){
             
+            //$fecha = date_format($fecha,"Y-m-d");
             $anio = substr($fecha, 0,4);
             $mes = $this->ObtenerMes(substr($fecha, 5,2));
             $dia = substr($fecha, 8,2);
@@ -1184,7 +1187,92 @@ class Pagina
             
             return $mes_name;
             
-        }        
+        } 
+        
+        //hecho por mi
+        public function TamanioArchivo($file_size_bits){
+            
+            if($file_size_bits<1024*1024*1024){
+                $size['NUM'] = round($file_size_bits/(1024*1024),2);
+                $size['UND'] ="mb";                            
+            }elseif($file_size_bits<1024*1024){
+                $size['NUM'] = round($file_size_bits/1024,2);
+                $size['UND'] ="kb";
+            }elseif($file_size_bits<1024){
+                $size['NUM'] = round($file_size_bits,2);
+                $size['UND'] ="bytes";
+            }
+            else{
+                $size['NUM']=0;
+                $size['UND']="-";
+            }
+            
+            return $size;
+        }
+        
+        //encontrado en Internet
+        public function FileSizeConvert($Kbytes)
+        {   
+            $bytes = $Kbytes*1024;//recibo los datos en Kb, lo multiplico para convertirlo a B; 1KB=1024B
+            $bytes = floatval($bytes);
+            
+                $arBytes = array(
+                    0 => array(
+                        "UNIT" => "TB",
+                        "VALUE" => pow(1024, 4)
+                    ),
+                    1 => array(
+                        "UNIT" => "GB",
+                        "VALUE" => pow(1024, 3)
+                    ),
+                    2 => array(
+                        "UNIT" => "MB",
+                        "VALUE" => pow(1024, 2)
+                    ),
+                    3 => array(
+                        "UNIT" => "KB",
+                        "VALUE" => 1024
+                    ),
+                    4 => array(
+                        "UNIT" => "B",
+                        "VALUE" => 1
+                    ),
+                );
+
+            foreach($arBytes as $arItem)
+            {
+                if($bytes >= $arItem["VALUE"])
+                {
+                    $result = $bytes / $arItem["VALUE"];
+                    //$result = str_replace(".", "," , strval(round($result, 2)))." ".$arItem["UNIT"];
+                    $result = round($result,2).' '.$arItem['UNIT'];
+                    break;
+                }else{
+                    $result = 0.0.' KB';
+                }
+            }
+            return $result;
+        }
+        
+        public function ObtenerExtensionDeArchivo($file){
+            
+            $info = new SplFileInfo($file);
+            return $info->getExtension();            
+            
+        }
+
+        public function ObtenerTiempoSolucion($t){
+            
+            if($t<60){
+                $r = $t." seg";
+            }elseif($t<3600){
+                $r = round($t/60)." min";
+            }else{
+                $r = round($t/3600)." hrs";
+            }            
+            
+            return $r;
+        }
         
 }
 ?>

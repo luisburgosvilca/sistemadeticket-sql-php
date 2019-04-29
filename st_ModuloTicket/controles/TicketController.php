@@ -2,13 +2,15 @@
 include_once("../st_ModuloSeguridad/controles/RecursosController.php");
 class TicketController extends RecursosController{
     
-    public function getUsuario(){
+    public function getDatosTransaccion($dataUser){
+                
+        $data['usuario_id'] = isset($_POST['usuario_id'])?$_POST['usuario_id']:$dataUser['usuario_id'];//$dataUser['usuario_id'];//
+        $data['ticket_id']  = isset($_POST['ticket_id'])?$_POST['ticket_id']:NULL;
+        $data['hostname']   = $this->getHostName();
+        $data['so']         = $this->getSistemaOperativo();
+        $data['ip']         = $this->getUserIpAddr();        
         
-        $dataUser['usuario_nombre'] = $_SESSION['usuario_nombre'];
-        $dataUser['usuario_id']     = $_SESSION['usuario_id'];
-        $dataUser['usuario_tipo']   = $_SESSION['usuaruio_tipo'];
-        
-        return $dataUser;
+        return $data;
     }
     
     public function MostrarTickets(){
@@ -25,10 +27,10 @@ class TicketController extends RecursosController{
         $dataUser = $this->getUsuario();
         
         include_once('../st_ModuloTicket/entidades/TicketEntity.php');
-        $TicketEntity = new TicketEntity;        
+        $TicketEntity = new TicketEntity;
         
         if($dataUser['usuario_tipo']==1){
-            $tickets = $TicketEntity->ObtenerTickets();    
+            $tickets = $TicketEntity->ObtenerTickets();
         }else{
             $tickets = $TicketEntity->ObtenerTicketsUsuario($dataUser);
         }   
@@ -52,27 +54,55 @@ class TicketController extends RecursosController{
     public function RegistrarTicket(){
         
         $dataUser=$this->getUsuario();
+        $data=$this->getDatosTransaccion($dataUser);
         
-        $data['asunto']     = $_POST['asunto'];
-        $data['descripcion']= utf8_decode($_POST['descripcion']);
+        $data['asunto']     = addslashes($_POST['asunto']);
+        $data['descripcion']= htmlspecialchars(addslashes($_POST['descripcion']));
         $data['lugar_id']   = substr($_POST['lugar_id'], 5);//settype(substr($_POST['lugar_id'], 5), INTEGER);
-        $data['ip']         = $this->getUserIpAddr();
-        $data['hostname']   = $this->getHostName();
-        $data['so']         = $this->getSistemaOperativo();
        
         include_once('../st_ModuloSeguridad/vistas/Mensaje.php');
         $Mensaje = new Mensaje();
-        
+        //var_dump($data);
         //var_dump($data);
         include_once ('../st_ModuloTicket/entidades/TicketEntity.php');
         $TicketEntity = new TicketEntity;
-        if($TicketEntity -> RegistrarTicket($data,$dataUser)){
+        //registrar imagen        
+        if($data['ticket_id'] = $TicketEntity -> RegistrarTicket($data,$dataUser)){
+            //echo $data['ticket_id'];
+            $data['codigo'] = $TicketEntity->RegistrarCodigo($data['ticket_id']);           
+            
+            /////////////////////////
+            ///Acción 1: RegistrarComentario de Inicio
+            $data['comentario'] = '<p>
+                                    <span class="label label-primary" style="width:100%; font-size:14px;">He regitrado un Ticket</span>
+                                   </p>';
+            $TicketEntity->RegistrarComentario($data, $dataUser);
+            ///Acción 3: Notificar vía Mail
+            $this->EnviarEmail($data);
+            ///Acción 4: Registrar para Notificar a Administradores
+            /////////////////////////
+            $data['count'] = count($_FILES['archivo']['tmp_name']);
+            if($data['count']>0){
+             
+                $resultado = $this->RegistrarArchivo($data,$dataUser);
+                //var_dump($resultado);
+                if($resultado==TRUE){
             $mensaje['descripcion'] = "Se registró el ticket satisfactoriamente.";
             $mensaje['clase']       = "success";
         }else{
-            $mensaje['descripcion'] = "Hubo un error al registrar el Ticket, si persiste, comuníquese con el administrador, o envíe un correo a: luis.burgos@aliada.com.pe, buen día, Dios lo bendiga";
+            $mensaje['descripcion'] = $resultado;
             $mensaje['clase']       = "warning";
-        }     
+        }
+        
+            }else{
+                $mensaje['descripcion'] = "Se registró el ticket satisfactoriamente.";
+                $mensaje['clase']       = "success";
+            }           
+
+        }else{
+            $mensaje['descripcion'] = "Hubo un error al registrar el Ticket, si persiste, comuníquese con el administrador, o envíe un correo a: luis.burgos@aliada.com.pe, buen día, Dios lo bendiga";
+            $mensaje['clase']       = "danger";
+        }           
         $Mensaje -> MostrarMensaje($dataUser,$mensaje);
     }
     
@@ -86,7 +116,7 @@ class TicketController extends RecursosController{
         $TicketEntity = new TicketEntity();
         $data = $TicketEntity-> DetalleTicket($ticket_id,$dataUser);
         //var_dump($data);
-        //$data['adminAsignado'] = $TicketEntity->ObtenerDatosPersonalesAdministratorAsignado($ticket_id);
+//        $data['adminAsignado'] = $TicketEntity->ObtenerDatosPersonalesAdministratorAsignado($ticket_id);
 //        switch ($data['adminAsignado']['estado_id']){
 //            case 1: $data['adminAsignado']['texto_estado']='Asignado a:';
 //                    break;
@@ -98,16 +128,13 @@ class TicketController extends RecursosController{
 //                    break;
 //            default : $data['adminAsignado']['texto_estado']='Asignado a:';
 //        }
-      //var_dump($data);          
+        
+        $data['files'] = $TicketEntity->ObtenerArchivosAdjuntos($ticket_id);
+        
         if($dataUser['usuario_tipo']==1){            
             $data['administradores'] = $TicketEntity->ObtenerAdministradores();            
-        
-            //echo json_encode($data['administradores']);
         }
-        
-//        for($i=0;$i<count($data['administradores']);$i++){
-//            echo $data['administradores'][$i]['admin']."<br>";
-//        }
+        //var_dump($data['files'][0]['extension']);
         include_once('../st_ModuloTicket/vistas/DetalleTicketView.php');
         $DetalleTicketView = new DetalleTicketView();
         $DetalleTicketView -> MostrarDetalleTicketView($data,$dataUser);
@@ -123,9 +150,7 @@ class TicketController extends RecursosController{
         include_once ('../st_ModuloTicket/entidades/TicketEntity.php');
         $TicketEntity = new TicketEntity();
         $comentarios = $TicketEntity -> ObtenerComentariosTicket($ticket_id,$dataUser);
-        
-        //var_dump($comentarios);
-        
+                
         include_once ('../st_ModuloTicket/vistas/Partials/PartialsComentarios.php');
         $TicketView = new PartialsComentarios();
         $TicketView -> MostrarComentarios($comentarios,$dataUser);
@@ -135,10 +160,9 @@ class TicketController extends RecursosController{
     public function RegistrarComentario(){
 
         $dataUser = $this->getUsuario();
+        $data=$this->getDatosTransaccion($dataUser);
 
-        $data['comentario'] = utf8_decode($_POST['comentario']); //trim($this->ValidarTexto($_POST['comentario']));
-        $data['usuario_id'] = $_POST["usuario_id"];
-        $data['ticket_id']  = $_POST["ticket_id"];
+        $data['comentario'] = ($_POST['comentario']); //trim($this->ValidarTexto($_POST['comentario']));
 
         include_once('../st_ModuloTicket/entidades/TicketEntity.php');
         $TicketEntity = new TicketEntity();
@@ -146,60 +170,71 @@ class TicketController extends RecursosController{
 
     }
     
-    public function AsignarAdministradorATicket(){
-        
-        $dataUser = $this->getUsuario();
-        
-        $data['admin_id']   = $_POST['admin_id'];
-        $data['usuario_id'] = $_POST['usuario_id'];
-        $data['ticket_id']  = $_POST['ticket_id'];
-        
-        include_once('../st_ModuloTicket/entidades/TicketEntity.php');
-        $TicketEntity = new TicketEntity();
-        if($TicketEntity -> AsignarAdministradorATicket($data,$dataUser)){
-
-            $dataAdmin = $TicketEntity->ObtenerDatosPersonalesAdministratorAsignado($data['ticket_id']);
-            
-            if($dataAdmin!=NULL){
-               $mensaje['descripcion']  = "<p class='text-green'>".utf8_encode($dataAdmin['nombre'].' '.$dataAdmin['apellido'])."</p>";
-               $mensaje['fecha']        = $dataAdmin['fechaAsignado'];
-               $mensaje['ticket_id']    = $data['ticket_id'];
-               $mensaje['usuario_id']   = $dataUser['usuario_id'];
-            }else{
-                $mensaje = "<dd><span class='label label-danger'>Aún no asignado.</span></dd>";
-            }
-           
-            /////
-            if($dataUser['usuario_tipo']==1){            
-            $mensaje['administradores'] = $TicketEntity->ObtenerAdministradores();   
-            $mensaje['admin_id'] = $data['admin_id'];
-        }   
-            /////
-            
-        }else{
-            $mensaje = "<p class='text-red'>Hubo un error en asignar ticket, vuelva a intentarlo</p>";
-        }
-        
-        include_once('../st_ModuloTicket/vistas/partials/PartialsAdminAssignedToTicket.php');
-        $PartialsAdminAssignedToTicket = new PartialsAdminAssignedToTicket();
-        $PartialsAdminAssignedToTicket ->MostrarResultadoAdministradorAsignado($mensaje);
-        
-    }
+//    public function AsignarAdministradorATicket(){
+//        
+//        $dataUser = $this->getUsuario();
+//        $data=$this->getDatosTransaccion($dataUser);
+//        
+//        $data['admin_id']   = $_POST['admin_id'];
+//        
+//        include_once('../st_ModuloTicket/entidades/TicketEntity.php');
+//        $TicketEntity = new TicketEntity();
+//        if($TicketEntity -> AsignarAdministradorATicket($data,$dataUser)){
+//
+//            $dataAdmin = $TicketEntity->ObtenerDatosPersonalesAdministratorAsignado($data['ticket_id']);
+//            
+//            if($dataAdmin!=NULL){
+//               $mensaje['descripcion']  = "<p class='text-green'>".utf8_encode($dataAdmin['nombre'].' '.$dataAdmin['apellido'])."</p>";
+//               $mensaje['fecha']        = $dataAdmin['fechaAsignado'];
+//               $mensaje['ticket_id']    = $data['ticket_id'];
+//               $mensaje['usuario_id']   = $dataUser['usuario_id'];
+//            }else{
+//                $mensaje = "<dd><span class='label label-danger'>Aún no asignado.</span></dd>";
+//            }
+//           
+//            /////
+//            if($dataUser['usuario_tipo']==1){            
+//            $mensaje['administradores'] = $TicketEntity->ObtenerAdministradores();   
+//            $mensaje['admin_id'] = $data['admin_id'];
+//        }   
+//            /////
+//            
+//        }else{
+//            $mensaje = "<p class='text-red'>Hubo un error en asignar ticket, vuelva a intentarlo</p>";
+//        }
+//        
+//        include_once('../st_ModuloTicket/vistas/partials/PartialsAdminAssignedToTicket.php');
+//        $PartialsAdminAssignedToTicket = new PartialsAdminAssignedToTicket();
+//        $PartialsAdminAssignedToTicket ->MostrarResultadoAdministradorAsignado($mensaje);
+//        
+//    }
     
     public function AsignarAdministradorATicket2(){
         
         $dataUser = $this->getUsuario();
-        
+        $data = $this->getDatosTransaccion($dataUser);
+        //var_dump($_POST['admin_id']);
         $data['admin_id']   = $_POST['admin_id'];
-        $data['usuario_id'] = $_POST['usuario_id'];
-        $data['ticket_id']  = $_POST['ticket_id'];
-        
-        $data['hostname_asigna']  = $this->getHostName();
-        $data['so_asigna']        = $this->getSistemaOperativo();
-        
+        //var_dump($data['admin_id']);
+        //var_dump($data['estado_id']);
         include_once('../st_ModuloTicket/entidades/TicketEntity.php');
         $TicketEntity = new TicketEntity();
         if($TicketEntity -> AsignarAdministradorATicket($data,$dataUser)){
+            echo $data['admin_id'].'-'.$dataUser['USUARIO'];
+            /////////////////////////////////
+            //Informar Asignacion de Ticekt
+            //1. Registrar Comentario marcado
+            
+            $data['comentario'] = '<p>
+                        <span class="label label-info" style="width:100%; font-size:14px;">'.$data['admin_id'].' resolverá este Ticket</span>
+                       </p>';
+            $TicketEntity->RegistrarComentario($data, $dataUser);
+            
+            //2.Notificar via Email
+            // 
+            ///////////////////////////////////
+            
+            
 
             $data = $TicketEntity ->DetalleTicket($data['ticket_id'], $dataUser);
             $data['administradores'] = $TicketEntity->ObtenerAdministradores();            
@@ -212,37 +247,29 @@ class TicketController extends RecursosController{
     
     }
     
-    public function SolicitarConfirmacionDeResuelto(){
-        
-        $dataUser = $this->getUsuario();
-        
-        $data['usuario_id'] = isset($_POST['usuario_id'])?$_POST['usuario_id']:$dataUser['usuario_id'];
-        $data['ticket_id']  = $_POST['ticket_id'];
-        $data['hostname_atendido']  = $this->getHostName();
-        $data['so_atendido']        = $this->getSistemaOperativo();
-
-        include_once('../st_ModuloTicket/entidades/TicketEntity.php');
-        $TicketEntity = new TicketEntity();
-       
-            include_once('../st_ModuloTicket/vistas/partials/PartialsEsperarConfirmacionDeUsuario.php');
-            $PartialsEsperarConfirmacionDeUsuario = new PartialsEsperarConfirmacionDeUsuario();
-        
-        if($TicketEntity ->MarcarComoResuelto($data,$dataUser)){
-            
-            $PartialsEsperarConfirmacionDeUsuario ->MostrarMensajeEsperarConfirmacionDeUsuario();
-        }else{
-            $PartialsEsperarConfirmacionDeUsuario->MostrarMensajeErrorAlMarcarComoResuelto();
-        }        
-    }
+//    public function SolicitarConfirmacionDeResuelto(){
+//        
+//        $dataUser = $this->getUsuario();
+//        $data = $this->getDatosTransaccion($dataUser);
+//        
+//        include_once('../st_ModuloTicket/entidades/TicketEntity.php');
+//        $TicketEntity = new TicketEntity();
+//       
+//            include_once('../st_ModuloTicket/vistas/partials/PartialsEsperarConfirmacionDeUsuario.php');
+//            $PartialsEsperarConfirmacionDeUsuario = new PartialsEsperarConfirmacionDeUsuario();
+//        
+//        if($TicketEntity ->MarcarComoResuelto($data,$dataUser)){
+//            
+//            $PartialsEsperarConfirmacionDeUsuario ->MostrarMensajeEsperarConfirmacionDeUsuario();
+//        }else{
+//            $PartialsEsperarConfirmacionDeUsuario->MostrarMensajeErrorAlMarcarComoResuelto();
+//        }        
+//    }
 
     public function SolicitarConfirmacionDeResuelto2(){
         
         $dataUser = $this->getUsuario();
-        
-        $data['usuario_id'] = isset($_POST['usuario_id'])?$_POST['usuario_id']:$dataUser['usuario_id'];
-        $data['ticket_id']  = $_POST['ticket_id'];
-        $data['hostname_atendido']  = $this->getHostName();
-        $data['so_atendido']        = $this->getSistemaOperativo();
+        $data=$this->getDatosTransaccion($dataUser);
 
         include_once('../st_ModuloTicket/entidades/TicketEntity.php');
         $TicketEntity = new TicketEntity();
@@ -251,6 +278,14 @@ class TicketController extends RecursosController{
         $PartialsMostrarEstadoTicket = new PartialsMostrarEstadoTicket();
         
         if($TicketEntity ->MarcarComoResuelto($data,$dataUser)){
+            
+            ///Acciones:
+            //1. Registrar Comentario marcado
+            $data['comentario'] = '<p>
+                                    <span class="label label-warning" style="width:100%; font-size:14px;">'.$dataUser['USUARIO'].' ha resuelto el Ticket, esperando confirmación.</span>
+                                   </p>';  
+            $TicketEntity->RegistrarComentario($data, $dataUser);
+            //2. Enviar Email
             
             $data = $TicketEntity ->DetalleTicket($data['ticket_id'], $dataUser);
             $PartialsMostrarEstadoTicket ->MostrarEstadoDeTicketAdmin($data, $dataUser);
@@ -262,16 +297,20 @@ class TicketController extends RecursosController{
     public function ResolverTicekt(){
         
         $dataUser = $this->getUsuario();
-        
-        $data['usuario_id'] = $dataUser['usuario_id'];
-        $data['ticket_id']  = $_POST['ticket_id'];
-        $data['hostname_confirmado'] = $this->getHostName();
-        $data['so_confirmado']= $this->getSistemaOperativo();
-        $data['ip_confirmado']= $this->getUserIpAddr();
+        $data = $this->getDatosTransaccion($dataUser);
         
         include_once('../st_ModuloTicket/entidades/TicketEntity.php');
         $TicketEntity = new TicketEntity();
         if($TicketEntity->TicketResuelto($data, $dataUser)){
+
+            ///Acciones:
+            //1. Registrar Comentario marcado
+            $data['comentario'] = '<p>
+                                    <span class="label label-success" style="width:100%; font-size:14px;">'.$dataUser['USUARIO'].' ha confirmado la solución del Ticket.</span>
+                                   </p>';  
+            $TicketEntity->RegistrarComentario($data, $dataUser);
+            //2. Enviar Email            
+            
         
             $data = $TicketEntity->DetalleTicket($data['ticket_id'], $dataUser);
             
@@ -281,6 +320,37 @@ class TicketController extends RecursosController{
             
         }       
     }
+    
+    public function NegarSolucionDeTicekt(){
+        
+        $dataUser = $this->getUsuario();        
+        $data = $this->getDatosTransaccion($dataUser);
+        //en esta parte resolver para que el administrador pueda ver el estado de cada ticket
+        $data['codigo'] = $_POST['codigo'];
+        $data['asunto'] = $_POST['asunto'];
+        $data['descripcion'] = $_POST['descripcion'];
+        
+        include_once('../st_ModuloTicket/entidades/TicketEntity.php');
+        $TicketEntity = new TicketEntity();
+        if($TicketEntity->NegarSolucionTicket($data,$dataUser)){
+            
+            ///Acciones:
+            //1. Registrar Comentario marcado
+            $data['comentario'] = '<p>
+                                    <span class="label label-danger" style="width:100%; font-size:14px;">'.$dataUser['USUARIO'].' indica que hay observaciones en la solución del Ticket.</span>
+                                   </p>';  
+            $TicketEntity->RegistrarComentario($data, $dataUser);
+            //2. Enviar Email                  
+         
+            $data = $TicketEntity->DetalleTicket($data['ticket_id'], $dataUser);
+            
+            include_once('../st_ModuloTicket/vistas/partials/PartialsMostrarEstadoTicket.php');
+            $PartialsMostrarEstadoTicket = new PartialsMostrarEstadoTicket();
+            $PartialsMostrarEstadoTicket ->MostrarEstadoDeTicketAdmin($data, $dataUser);            
+            
+        }
+    }    
+    
     //////////////////////
     public function EscucharCambioEstadoTicekt(){
         
@@ -312,9 +382,7 @@ class TicketController extends RecursosController{
         $TicketEntity = new TicketEntity();
         $data = $TicketEntity->DetalleTicket($data['ticket_id'], $dataUser);   
         
-        if($dataUser['usuario_tipo']==1){            
-            $data['administradores'] = $TicketEntity->ObtenerAdministradores();            
-        }
+        $data['administradores']= $TicketEntity->ObtenerAdministradores();
         
         include_once('../st_ModuloTicket/vistas/partials/PartialsMostrarEstadoTicket.php');
         $PartialsMostrarCambioDeEstadoDeTicket = new PartialsMostrarEstadoTicket();

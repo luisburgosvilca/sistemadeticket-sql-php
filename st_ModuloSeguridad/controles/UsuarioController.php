@@ -22,16 +22,40 @@ class UsuarioController extends RecursosController
                     $ObjUser = new Usuario;
                                        
                         if($usu = $ObjUser ->VerificarExistenciaDeUsuario($username)){
-                            //die(var_dump($usu));
-                            if($dataUsuario = $ObjUser ->AutenticarUsuario($usu['id'],$password)){
+                            //die(var_dump($usu['CLAVE']));
+                            $dataUser['USUARIO'] = $usu['USUARIO'];
+                            $dataUser['CLAVE']   = $usu['CLAVE'];
+                            $dataUser['NOMBRE']  = $usu['NOMBRE'];
+                            $dataUser['Persona'] = $usu['Persona'];
+                            $dataUser['CMP']     = $usu['CMP'];
+                            $dataUser['iniciales'] = $usu['INICIALES'];
+                            
+                            $dataUsuario = $ObjUser ->AutenticarUsuario($usu['CLAVE']);
+                            //die(var_dump($dataUsuario['clave']));
+                            if($dataUsuario['clave']==$password){
                                 
-                                $dataUser['usuario_nombre'] = ucfirst($dataUsuario['nombre'])." ".ucfirst($dataUsuario['apellido']);
-                                $dataUser['usuario_id'] = $dataUsuario['id'];
+                                if(isset($dataUser['Persona'])){
+                                    
+                                    $dataUsuario=$ObjUser->ObtenerDatosPersonales($dataUser['Persona']);
+                                    //var_dump($dataUsuario['Persona']);
+                                    $dataUser['ApellidoPaterno'] = $dataUsuario['ApellidoPaterno'];
+                                    $dataUser['ApellidoMaterno'] = $dataUsuario['ApellidoMaterno'];
+                                    $dataUser['Nombres']         = $dataUsuario['Nombres'];
+                                
+                                    $dataUser['usuario_nombre'] = ucfirst(strtolower($dataUser['Nombres']))." ".ucfirst(strtolower($dataUser['ApellidoPaterno']));    
+                                }else{
+                                    $dataUser['usuario_nombre'] = $usu['NOMBRE'];
+                                }
+                               
+                                $dataUser['usuario_id']     = $dataUsuario['Persona'];                              
+                                $dataUsuario=$ObjUser->EsAdministrador($dataUsuario['Persona'], $dataUser);
                                 $dataUser['usuario_tipo']=$dataUsuario['tipo_id'];
-                                
+                                //var_dump($dataUsuario['tipo_id']);
                                 $_SESSION['usuario_nombre'] = $dataUser['usuario_nombre'];
                                 $_SESSION['usuario_id']     = $dataUser['usuario_id'];
                                 $_SESSION['usuaruio_tipo']  = $dataUser['usuario_tipo'];
+                                $_SESSION['USUARIO']        = $dataUser['USUARIO'];
+                                $_SESSION['Persona']        = $dataUser['Persona'];        
                                 
                                 include_once ('../st_ModuloSeguridad/vistas/Dashboard.php');
                                 $ObjView = new Dashboard;

@@ -19,7 +19,10 @@ class FormularioNuevoTicketView extends Pagina{
 	<link type="text/css" rel="stylesheet" href="../st_includes/jstree/_docs/syntax/!style.css"/>
 	<link type="text/css" rel="stylesheet" href="../st_includes/jstree/_docs/!style.css"/>
   <script type="text/javascript" src="../st_includes/jstree/_docs/syntax/!script.js"></script>
-        
+<script src="//cdn.ckeditor.com/4.11.4/full/ckeditor.js"></script>
+<!--<script src="../st_includes/js/ckeditor.js"></script>-->
+  
+  
         <!-- daterange picker --
         <link rel="stylesheet" href="../st_includes/bower_components/bootstrap-daterangepicker/daterangepicker.css">-->
         <!-- bootstrap datepicker --
@@ -85,18 +88,25 @@ class FormularioNuevoTicketView extends Pagina{
             </div>
             <!-- /.box-header -->
             <!-- form start -->
-            <form role="form" action="getTicket.php" method="POST">
+            <form role="form" action="getTicket.php" method="POST" enctype="multipart/form-data" autocomplete="off">
               <div class="box-body">
                 <div class="form-group">
                   <label for="exampleInputEmail1">Asunto</label>
                   <input type="text" name="asunto" class="form-control" required="" placeholder="Indique motivo">
                 </div>
                 <div class="form-group">
-                  <label for="exampleInputPassword1">Descripción</label>
-                  <textarea class="form-control" name="descripcion" required="" placeholder="Detalle datos del problema"></textarea>                  
+                  <label>Descripción</label>
+                  <textarea class="form-control" id="editor1" name="descripcion" required=""  placeholder="Detalle datos del problema"></textarea>
+                    <script>
+                        CKEDITOR.replace('editor1', {
+                            removeButtons: 'Save,Form,Checkbox,Radio,TextField,Textarea,Select,Button,ImageButton,HiddenField,CreateDiv,Anchor,Language,Flash,PageBreak,Iframe,ShowBlocks,About'
+//                          width: '70%',
+//                          height: 500
+                        });
+                      </script>                  
                 </div>
                 <div class="form-group">
-                  <label >Lugar</label><input type="text" name="lugar_id" class="form-control" required="" placeholder="Indique Lugar"><br>
+<!--                  <label >Lugar</label><input type="text" name="lugar_id" class="form-control" required="" placeholder="Indique Lugar"><br>-->
 <!--////////////////////////////////////////////////////-->
 <!-- the tree container (notice NOT an UL node) -->
 <!--<div id="demo" class="demo" style="height:200px;"></div>-->
@@ -217,17 +227,16 @@ class FormularioNuevoTicketView extends Pagina{
   </script>
 
 <!--////////////////////////////////////////////////////////////////////////////////////////////////////////-->
-                  <input type="text" name="lugar" class="form-control transparente" placeholder="Lugar de atención">
+
+   <!--               <input type="text" name="lugar" class="form-control transparente" placeholder="Lugar de atención">-->
                 </div>
-                
-               <!--
                 <div class="form-group">
                   <label for="exampleInputFile">Adjuntar archivo</label>
-                  <input type="file" id="exampleInputFile">
+                  <input type="file" id="exampleInputFile" multiple="" name="archivo[]"><!-- accept="image/*,video/*,.pdf,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel,application/msword,application/vnd.ms-powerpoint,text/plain" -->
 
-                  <p class="help-block">(opcional)</p>
+                    <!--<p class="help-block">Limite: 8 mb</p>-->
                 </div>
--->
+
               </div>
               <!-- /.box-body -->
 

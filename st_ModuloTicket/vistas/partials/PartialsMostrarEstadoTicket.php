@@ -4,7 +4,7 @@ class PartialsMostrarEstadoTicket extends Pagina{
 
     public function MostrarEstadoDeTicketAdmin($data,$dataUser){
         //var_dump($data);
-        $administradores = !isset($data['administradores'])?:$data['administradores'];
+        $formato = "Y-m-d H:i:s";
         ?>
     <input type="hidden" id="usuario_id" value="<?php echo $data['asignado_a_usuario_id']?>">
     <input type="hidden" id="ticket_id"  value="<?php echo $data['id']?>">
@@ -67,17 +67,42 @@ class PartialsMostrarEstadoTicket extends Pagina{
                     });                            
             }
         });            
+        
+        $("#negar_solucion").click(function(){
+            var usuario_id  = $("#usuario_id").val();
+            var ticket_id   = $("#ticket_id").val();
+            var codigo      = $("#codigo").val();
+            var asunto      = $("#asunto").val();
+            var descripcion = $("#descripcion").val();
+            var confirmation = confirm("¿Informar que no está resuelto el Ticket?");   
+
+            if(confirmation){
+                $("#estado_ticket_admin").html("<center><img class='img img-responsive' width='80%' src='../st_includes/img/loading_pacman.gif' /> Esperando confirmación de usuario</center>");
+                    $.ajax({
+                        type:       'POST',
+                        dataType:   'html',
+                        url:        '../st_ModuloTicket/getTicket.php',
+                        data:       {negar_resuelto:'negar_resuelto', usuario_id: usuario_id,ticket_id:ticket_id,codigo:codigo,asunto:asunto,descripcion:descripcion},
+                        success: function(wait_for_confirmation){
+                            $("#estado_ticket_admin").html(wait_for_confirmation);
+                        }
+                    });                            
+            }                        
+        });                 
+        
+        
     </script>
-            <?php if($dataUser['usuario_tipo']==1){?>
+            <?php if($dataUser['usuario_tipo']==1){
+                $administradores = isset($data['administradores'])?$data['administradores']:NULL;?>
             <dl>               
                 <?php 
-                if($data['estado_id']==1){?>
-                <dt>Asignar a:</dt><?php //var_dump($administradores)?>
+                if($data['estado_id']==28){?>
+                <dt>Asignar a:</dt><?php //echo $admin_asignado['texto_estado']?>
                     <dd>    <select class="" name="admin" id="asignar_administrador" data-size="6">
                            <option value="0"> - - - </option>
                            <?php 
                                 for($i=0;$i<count($administradores);$i++){?>
-                                    <option value="<?php echo $administradores[$i]['id']?>"> <?php echo utf8_decode($administradores[$i]['admin'])?></option>
+                                    <option value="<?php echo $administradores[$i]['USUARIO']?>"> <?php echo utf8_decode($administradores[$i]['admin'])?></option>
                                <?php
                                    }
                                ?>
@@ -86,21 +111,21 @@ class PartialsMostrarEstadoTicket extends Pagina{
                     <dt>Asignado a:</dt> 
                     <dd><span class="label label-danger">Aún no asignado.</span></dd>                                       
                 <?php }
-                else if($data['estado_id']==2){?>
+                else if($data['estado_id']==29){?>
                     <dt>Asignar a:</dt>
                     <dd>
                         <select class="" name="admin" id="asignar_administrador">
                                <option value="0"> - - - </option>
                                <?php 
-                               for($i=0;$i<count($administradores);$i++){ ?>
-                                   <option <?php echo ($data['asignado_a_usuario_id']==$administradores[$i]['id']?'selected="selected"':'')?> value="<?php echo $administradores[$i]['id']?>"> <?php echo utf8_encode($administradores[$i]['admin'])?></option>
+                              foreach($administradores as $value){?>
+                                   <option <?php echo ($data['asignado_a_usuario_id']==$value['USUARIO']?'selected="selected"':'')?> value="<?php echo $value['USUARIO']?>"> <?php echo utf8_encode($value['admin'])?></option>
                                    <?php
                                        }
                                    ?>
                         </select>
                     </dd>
                         <dt>Asignado a:</dt>  
-                        <dd><?php echo "<p class='text-green'>".utf8_encode($data['administrador'])."</p>"?></dd>                    
+                        <dd><?php echo "<p class='text-green'>".utf8_encode($data['asignado_a_usuario_id'])."</p>"?></dd>                    
                     <dt>Fecha:</dt>
                     <dd><?php echo $this->FormatoFecha(date_format($data['fechaAsignado'], 'Y-m-d H:i:s'))?> | <?php echo substr(date_format($data['fechaAsignado'], 'Y-m-d H:i:s'), 11,5)?></dd>
                     <dt>Estado:</dt>                                                         
@@ -116,10 +141,10 @@ class PartialsMostrarEstadoTicket extends Pagina{
                           <button style="width: 100%" id="marcar_como_resuelto" class="btn  btn-success">Marcar como resuelto</button>
                                       
                 <?php }
-                else if($data['estado_id']==3){
+                else if($data['estado_id']==30){
                     ?>                         
                     <dt>Atendido por:</dt>  
-                        <dd><?php echo "<p class='text-green'>".utf8_encode($data['administrador_atendio'])."</p>"?></dd>
+                        <dd><?php echo "<p class='text-green'>".utf8_encode($data['asignado_a_usuario_id'])."</p>"?></dd>
                     <dt>Fecha atendido:</dt>
                     <dd><?php echo $this->FormatoFecha(date_format($data['fechaAtendido'], 'Y-m-d H:i:s'))?> | <?php echo substr(date_format($data['fechaAtendido'], 'Y-m-d H:i:s'), 11,5)?></dd>                    
                     <dt>Estado:</dt>
@@ -138,17 +163,17 @@ class PartialsMostrarEstadoTicket extends Pagina{
                       <div class="form-group">
                         <label class="col-sm-12 control-label">Confirmar la atención del Ticekt:</label>
                       </div>
-                        
+                        <button id="negar_solucion" type="submit" class="btn btn-default">No, no está Resuelto</button>
                         <button id="confirmar_solucion" type="submit" class="btn btn-success">Sí, está Resuelto</button>                        
                         
                     <?php
                 }
-                else if($data['estado_id']==4){
+                else if($data['estado_id']==31){
                     ?>
                         <dt>Resuelto por:</dt>       
-                            <dd><?php echo "<p class='text-green'>".utf8_encode($data['administrador_atendio'])."</p>"?></dd>                        
+                            <dd><?php echo "<p class='text-green'>".utf8_encode($data['atendido_por_usuario_id'])."</p>"?></dd>                        
                         <dt>Fecha atendido:</dt>
-                        <dd><?php echo $this->FormatoFecha(date_format($data['fechaAtendido'], 'Y-m-d H:i:s'))?> | <?php echo substr(date_format($data['fechaAtendido'],'Y-m-d H:i:s'), 11,5)?></dd>                    
+                            <dd><?php echo $this->FormatoFecha(date_format($data['fechaAtendido'],"Y-m-d"))?> | <?php echo substr(date_format($data['fechaAtendido'],"Y-m-d H:i:s"), 11,5)?></dd>                    
                         <dt>Estado:</dt>
                             <dd><span class="label label-success">Resuelto</span></dd>
                         <?php
@@ -158,14 +183,14 @@ class PartialsMostrarEstadoTicket extends Pagina{
             
             <?php }else{//usuario
                              
-                            if($data['estado_id']==1){?>    
+                            if($data['estado_id']==28){?>    
                           <div id="estado_ticket_usuario">  
                                 <dt>Asignado a:</dt> 
                                 <dd><span class="label label-danger">Aún no asignado.</span></dd>                                       
                             <?php }
-                            else if($data['estado_id']==2){?>
+                            else if($data['estado_id']==29){?>
                                 <dt>Asignado a:</dt>  
-                                <dd><?php echo "<p class='text-green'>".utf8_encode($data['administrador'])."</p>"?></dd>                                     
+                                <dd><?php echo "<p class='text-green'>".utf8_encode($data['asignado_a_usuario_id'])."</p>"?></dd>                                     
                                 <dt>Fecha:</dt>
                                 <dd><?php echo $this->FormatoFecha(date_format($data['fechaAsignado'], 'Y-m-d H:i:s'))?> | <?php echo substr(date_format($data['fechaAsignado'], 'Y-m-d H:i:s'), 11,5)?></dd>
                                 <dt>Estado:</dt>                                                         
@@ -181,12 +206,12 @@ class PartialsMostrarEstadoTicket extends Pagina{
                                       <!--<button style="width: 100%" id="marcar_como_resuelto" class="btn  btn-success">Marcar como resuelto</button>-->
 
                             <?php }
-                            else if($data['estado_id']==3){
+                            else if($data['estado_id']==30){//var_dump($data['atendido_por_usuario_id']);
                                 ?>                         
                                 <dt>Atendido por:</dt>  
-                                    <dd><?php echo "<p class='text-green'>".utf8_encode($data['administrador_atendio'])."</p>"?></dd>
+                                    <dd><?php echo "<p class='text-green'>".utf8_encode($data['atendido_por_usuario_id'])."</p>"?></dd>
                                 <dt>Fecha atendido:</dt>
-                                <dd><?php echo $this->FormatoFecha(date_format($data['fechaAtendido'], 'Y-m-d H:i:s'))?> | <?php echo substr(date_format($data['fechaAtendido'], 'Y-m-d H:i:s'), 11,5)?></dd>                    
+                                <dd><?php echo $this->FormatoFecha(date_format($data['fechaAtendido'], $formato))?> | <?php echo substr(date_format($data['fechaAtendido'], $formato), 11,5)?></dd>                    
                                 <dt>Estado:</dt>
                                     <dd><span class="label bg-blue">Atendido</span></dd> 
                                     <br>
@@ -204,14 +229,15 @@ class PartialsMostrarEstadoTicket extends Pagina{
                                     <label class="col-sm-12 control-label">Confirmar la solución del Ticekt:</label>
                                   </div>
                                     <!-- agregar botón cancelar -->
+                                    <button id="negar_solucion" type="submit" class="btn btn-default">No, no está Resuelto</button>
                                     <button id="confirmar_solucion" type="submit" class="btn btn-success">Sí, está Resuelto</button>                        
 
                                 <?php
                             }
-                            else if($data['estado_id']==4){
+                            else if($data['estado_id']==31){
                                 ?>
                                     <dt>Resuelto por:</dt>       
-                                        <dd><?php echo "<p class='text-green'>".utf8_encode($data['administrador_atendio'])."</p>"?></dd>                        
+                                        <dd><?php echo "<p class='text-green'>".utf8_encode($data['atendido_por_usuario_id'])."</p>"?></dd>                        
                                     <dt>Fecha atendido:</dt>
                                     <dd><?php echo $this->FormatoFecha(date_format($data['fechaAtendido'], 'Y-m-d H:i:s'))?> | <?php echo substr(date_format($data['fechaAtendido'], 'Y-m-d H:i:s'), 11,5)?></dd>                    
                                     <dt>Estado:</dt>

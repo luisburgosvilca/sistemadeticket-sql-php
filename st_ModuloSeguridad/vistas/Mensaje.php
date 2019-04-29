@@ -8,6 +8,7 @@ class Mensaje extends Pagina{
         $data['titulo'] = "Mensaje";
         $data['js']     = "" ;
         $dataUser['menu'] = "Ticket";
+        $data['dataUser'] = $dataUser;
 
         $this->MostrarHead($data);
         $this->MostrarHeader($dataUser);
@@ -44,7 +45,35 @@ class Mensaje extends Pagina{
       
     <!-- Main content -->
     <section class="content">
+    <?php 
+            //var_dump($data['dataUser']);
+        if($data['dataUser']['usuario_tipo']==1){
+            echo '<script>
+		Push.create("Hello Kioto",{
+			body: "Respuesta a Ticket",
+			icon: "img/logo.png",
+			timeout: 10000,
+			onClick: function (){
+				window.location="http://10.7.16.211/SistemaDeTicket/st_ModuloTicket/";
+				this.close();
+			}
+		});
+	</script>';
+        }else{
+            echo '<script>
+		Push.create("te saluda el administrador",{
+			body: "Respuesta a Ticket",
+			icon: "img/logo.png",
+			timeout: 10000,
+			onClick: function (){
+				window.location="http://10.7.16.211/SistemaDeTicket/st_ModuloTicket/";
+				this.close();
+			}
+		});
+	</script>';
+        }
     
+    ?>
         <?php //$this->MostrarDatosDashboard()?>
         <?php //$this->MostrarInformacionAdicionalDashboard()?>
         

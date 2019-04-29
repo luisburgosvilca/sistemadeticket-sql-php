@@ -29,13 +29,13 @@ else if(isset($_POST['ver_ticket']) && isset($_SESSION['usuario_id'])){
     $TicketController -> DetalleTicket();
 }
 
-elseif(isset($_POST['enviar_comentario']) && isset($_SESSION['usuario_id'])){
-    
-    include_once('../st_ModuloTicket/controles/TicketController.php');
-    $TicketController = new TicketController();
-    $TicketController -> RegistrarComentario();
-    
-}
+//elseif(isset($_POST['enviar_comentario']) && isset($_SESSION['usuario_id'])){
+//    
+//    include_once('../st_ModuloTicket/controles/TicketController.php');
+//    $TicketController = new TicketController();
+//    $TicketController -> RegistrarComentario();
+//    
+//}
 
 elseif(isset($_POST['action']) && isset($_SESSION['usuario_id'])){
     
@@ -44,31 +44,31 @@ elseif(isset($_POST['action']) && isset($_SESSION['usuario_id'])){
     $TicketController -> MostrarComentarios();
 }
 
-elseif(isset($_POST['comentario']) && isset($_SESSION['usuario_id'])){
+elseif(isset($_POST['registrar_comentario']) && isset($_SESSION['usuario_id'])){
 
     include_once('../st_ModuloTicket/controles/TicketController.php');
     $TicketController = new TicketController();
     $TicketController -> RegistrarComentario();
 
 }
-elseif(isset($_POST['admin_id*']) && isset($_SESSION['usuario_id'])){
-    
-    include_once('../st_ModuloTicket/controles/TicketController.php');
-    $TicketController = new TicketController();
-    $TicketController -> AsignarAdministradorATicket();    
-}
+//elseif(isset($_POST['admin_id*']) && isset($_SESSION['usuario_id'])){
+//    
+//    include_once('../st_ModuloTicket/controles/TicketController.php');
+//    $TicketController = new TicketController();
+//    $TicketController -> AsignarAdministradorATicket();    
+//}
 elseif(isset($_POST['admin_id']) && isset($_SESSION['usuario_id'])){
     
     include_once('../st_ModuloTicket/controles/TicketController.php');
     $TicketController = new TicketController();
     $TicketController -> AsignarAdministradorATicket2();    
 }
-elseif(isset($_POST['confirmar_resuelto*']) && isset($_SESSION['usuario_id'])){
-    //echo "hola";
-    include_once('../st_ModuloTicket/controles/TicketController.php');
-    $TicketController = new TicketController();
-    $TicketController -> SolicitarConfirmacionDeResuelto();    
-}
+//elseif(isset($_POST['confirmar_resuelto*']) && isset($_SESSION['usuario_id'])){
+//    //echo "hola";
+//    include_once('../st_ModuloTicket/controles/TicketController.php');
+//    $TicketController = new TicketController();
+//    $TicketController -> SolicitarConfirmacionDeResuelto();    
+//}
 elseif(isset($_POST['marcar_resuelto']) && isset($_SESSION['usuario_id'])){
     //echo "hola";
     include_once('../st_ModuloTicket/controles/TicketController.php');
@@ -80,6 +80,11 @@ elseif(isset($_POST['confirmar_resuelto']) && isset($_SESSION['usuario_id'])){
     include_once('../st_ModuloTicket/controles/TicketController.php');
     $TicketController = new TicketController();
     $TicketController -> ResolverTicekt();
+}
+elseif(isset($_POST['negar_resuelto']) && isset($_SESSION['usuario_id'])){
+    include_once('../st_ModuloTicket/controles/TicketController.php');
+    $TicketController = new TicketController();
+    $TicketController -> NegarSolucionDeTicekt();
 }
 //////////////
 else if(isset ($_POST['cambio_estado']) && isset ($_SESSION['usuario_id'])){

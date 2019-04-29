@@ -38,7 +38,6 @@ class TicketView extends Pagina{
                      CargarTickets();
                     },10000);                 
             });
-
         </script>            
         <?php        
         

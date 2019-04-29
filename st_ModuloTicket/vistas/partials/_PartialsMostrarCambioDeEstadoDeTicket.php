@@ -11,12 +11,12 @@ class PartialsMostrarCambioDeEstadoDeTicket extends Pagina{
                 <?php
         }
         
-        if($data['ticket']['estado_id']==1){?>                          
+        if($data['ticket']['estado_id']==28){?>                          
            <dd><span class="label label-danger">Aún no ha sido asignado</span></dd>
                        <?php
                }
-               elseif($data['ticket']['estado_id']>=2 && $data['ticket']['estado_id']<=4){?>                          
-               <dd><?php echo "<p class='text-green'>".utf8_encode($data['ticket']['administrador'])."</p>"?></dd>                         
+               elseif($data['ticket']['estado_id']>=29 && $data['ticket']['estado_id']<=31){?>                          
+               <dd><?php echo "<p class='text-green'>".utf8_encode($data['ticket']['asignado_a'])."</p>"?></dd>                         
                <dt>Fecha:</dt>
                  <dd><?php echo $this->FormatoFecha($data['ticket']['fechaAsignado'])?> | <?php echo substr($data['ticket']['fechaAsignado'], 11,5)?></dd>                                            
                  <dt>Estado de la solución:</dt>                                     

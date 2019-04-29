@@ -33,33 +33,42 @@ class PartialsMostrarTickets extends Pagina{
                    
                         for($i=0;$i<count($ticket);$i++){                         
                         //var_dump($ticket);
-                        if($ticket[$i]['administrador'] == "No asignado"){
+                        if($ticket[$i]['asignado_a'] == "No asignado"){
                             
                             $p="<p class= 'tachado'> No asignado</p>";
                         }else{
-                            $p= utf8_encode($ticket[$i]['administrador']);
+                            $p= utf8_encode($ticket[$i]['asignado_a']);
                         }
+                        if($ticket[$i]['fechaAtendido']){
+                            $fechaAntendido = $this->FormatoFecha($ticket[$i]['fechaAtendido']).' | '.substr($ticket[$i]['fechaAtendido'],11,5);
+                        }else{
+                            $fechaAntendido= NULL;
+                         }
+                                                  
+                         
+//                        var_dump($this->FormatoFecha($ticket[$i]['fechaAtendido']) echo substr($ticket[$i]['fechaAtendido'],11,5));
+//                        $fechaAtendido = $this->FormatoFecha($ticket[$i]['fechaAtendido']) echo substr($ticket[$i]['fechaAtendido'],11,5);
                         
                         switch ($ticket[$i]['estado_id']){
-                        case 1: $estado='<span class="label label-danger">Registrado</span>';break;
-                        case 2: $estado='<span class="label label-warning">Asignado</span>';break;
-                        case 3: $estado='<span class="label bg-blue">Por confirmar</span>';break;
-                        case 4: $estado='<span class="label label-success">Resuelto</span>';break;
+                        case 28: $estado='<span class="label label-danger">Registrado</span>';break;
+                        case 29: $estado='<span class="label label-warning">Asignado</span>';break;
+                        case 30: $estado='<span class="label bg-blue">Por confirmar</span>';break;
+                        case 31: $estado='<span class="label label-success">Resuelto</span>';break;
                             default : $estado='<span class="label label-info">Hubo un error en el registro</span>';
                         }
                             
                             ?>
                 <tr>
-                  <td><?php echo ($i+1)?></td>
+                  <td><?php echo $ticket[$i]['codigo']?></td>
                   <td>
                       <form name="ver_ticket" action="../st_ModuloTicket/getTicket.php" method="POST">
                           <button type="submit" class="btn btn-warning btn-xs" name="ver_ticket"><i class="fa fa-file-text-o"></i></button>
                           <input type="hidden" name="ticket_id" value="<?php echo $ticket[$i]['id']?>">
                           
                           <?php
-                          if($dataUser['usuario_id']==$ticket[$i]['registrado_por_usuario_id']){
+                          if($dataUser['USUARIO']==$ticket[$i]['registrado_por_usuario_id']){
                               ?>
-                          <button type="submit" class="btn btn-primary btn-xs" name="editar_ticket"><i class="fa fa-pencil"></i></button>
+                            <!--<button type="submit" class="btn btn-primary btn-xs" name="editar_ticket"><i class="fa fa-pencil"></i></button>-->
                           <?php
                           }
                           ?>
@@ -67,14 +76,14 @@ class PartialsMostrarTickets extends Pagina{
                   </td>
                   <?php if($dataUser['usuario_tipo']==1){ ?>
                   <td><?php echo ($ticket[$i]['lugar'])?></td>
-                  <td><?php echo utf8_encode($ticket[$i]['autor'])?></td>                  
+                  <td><?php echo utf8_encode($ticket[$i]['registrado_por'])?></td>                  
                   <?php }?>
-                  <td><?php echo utf8_decode($ticket[$i]['asunto'])?></td>
+                  <td><?php echo ($ticket[$i]['asunto'])?></td>
                   <td><?php echo $this->FormatoFecha($ticket[$i]['fechaRegistro'])?> | <?php echo substr($ticket[$i]['fechaRegistro'],11,5)?></td>
                   <td><?php echo $estado?></td>
                   <td><?php echo $p?></td>
-                  <td><?PHP ECHO $ticket[$i]['id']?></td>
-                  <td></td>
+                  <td><?php echo $fechaAntendido?></td>
+                  <td><?php echo ($ticket[$i]['tiempo_solucion']==NULL)?'':$this->ObtenerTiempoSolucion($ticket[$i]['tiempo_solucion']) ?></td>
                   
                 </tr>
                                    
@@ -111,7 +120,9 @@ class PartialsMostrarTickets extends Pagina{
       'searching'   : true,
       'ordering'    : true,
       'info'        : true,
-      'autoWidth'   : true
+      'autoWidth'   : true,
+      'order'       : [[ 1, "desc" ]]
+      
     })
   })
 </script>
