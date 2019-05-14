@@ -8,6 +8,7 @@ class PartialsMostrarEstadoTicket extends Pagina{
         ?>
     <input type="hidden" id="usuario_id" value="<?php echo $data['asignado_a_usuario_id']?>">
     <input type="hidden" id="ticket_id"  value="<?php echo $data['id']?>">
+    <input type="hidden" id="sistema_id" value="<?php echo $dataUser['sistema_id']?>"><!-- t: Menu; sistema_id: valor de administrador -->
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.7/dist/css/bootstrap-select.min.css">
     <script>
@@ -15,13 +16,15 @@ class PartialsMostrarEstadoTicket extends Pagina{
             var admin_id =$(this).val();
                 usuario_id = $("#usuario_id").val();
                 ticket_id= $("#ticket_id").val();
+                sistema_id= $("#sistema_id").val();
+                //alert(sistema_id);
 
             $("#estado_ticket_admin").html("<center><img class='img img-responsive' width='80%' src='../st_includes/img/loader.gif' /> Asignando administrador a ticket</center>");
                 $.ajax({
                     type:       'POST',
                     dataType:   'html',
                     url:        '../st_ModuloTicket/getTicket.php',
-                    data:       {admin_id:admin_id, usuario_id: usuario_id,ticket_id:ticket_id},
+                    data:       {admin_id:admin_id, usuario_id: usuario_id,ticket_id:ticket_id, sistema_id:sistema_id},
                     success: function(respuesta){
                         $("#estado_ticket_admin").html(respuesta);
                     }
@@ -31,6 +34,7 @@ class PartialsMostrarEstadoTicket extends Pagina{
         $("#marcar_como_resuelto").click(function(){
             var ticket_id = $("#ticket_id").val();
             var usuario_id = $("#usuario_id").val();
+            var sistema_id= $("#sistema_id").val();
             //console.log(ticket_id);
              confirmation = confirm("¿Desea Marcar este ticket como resuelto?");
             if(confirmation){
@@ -40,7 +44,7 @@ class PartialsMostrarEstadoTicket extends Pagina{
                         type:       'POST',
                         dataType:   'html',
                         url:        '../st_ModuloTicket/getTicket.php',
-                        data:       {marcar_resuelto:'marcar_resuelto', usuario_id: usuario_id,ticket_id:ticket_id},
+                        data:       {marcar_resuelto:'marcar_resuelto', usuario_id: usuario_id,ticket_id:ticket_id,sistema_id:sistema_id},
                         success: function(wait_for_confirmation){
                             $("#estado_ticket_admin").html(wait_for_confirmation);
                         }
@@ -52,6 +56,7 @@ class PartialsMostrarEstadoTicket extends Pagina{
         $("#confirmar_solucion").click(function(){
             var usuario_id = $("#usuario_id").val();
             var ticket_id = $("#ticket_id").val();
+            var sistema_id= $("#sistema_id").val();
             var confirmation = confirm("¿Desea confirmar la solución de este Ticket?");
 
             if(confirmation){
@@ -60,7 +65,7 @@ class PartialsMostrarEstadoTicket extends Pagina{
                         type:       'POST',
                         dataType:   'html',
                         url:        '../st_ModuloTicket/getTicket.php',
-                        data:       {confirmar_resuelto:'confirmar_resuelto', usuario_id: usuario_id,ticket_id:ticket_id},
+                        data:       {confirmar_resuelto:'confirmar_resuelto', usuario_id: usuario_id,ticket_id:ticket_id,sistema_id:sistema_id},
                         success: function(wait_for_confirmation){
                             $("#estado_ticket_admin").html(wait_for_confirmation);
                         }
@@ -74,6 +79,8 @@ class PartialsMostrarEstadoTicket extends Pagina{
             var codigo      = $("#codigo").val();
             var asunto      = $("#asunto").val();
             var descripcion = $("#descripcion").val();
+            var sistema_id= $("#sistema_id").val();
+            
             var confirmation = confirm("¿Informar que no está resuelto el Ticket?");   
 
             if(confirmation){
@@ -82,7 +89,7 @@ class PartialsMostrarEstadoTicket extends Pagina{
                         type:       'POST',
                         dataType:   'html',
                         url:        '../st_ModuloTicket/getTicket.php',
-                        data:       {negar_resuelto:'negar_resuelto', usuario_id: usuario_id,ticket_id:ticket_id,codigo:codigo,asunto:asunto,descripcion:descripcion},
+                        data:       {negar_resuelto:'negar_resuelto', usuario_id: usuario_id,ticket_id:ticket_id,codigo:codigo,asunto:asunto,descripcion:descripcion,sistema_id:sistema_id},
                         success: function(wait_for_confirmation){
                             $("#estado_ticket_admin").html(wait_for_confirmation);
                         }
@@ -92,8 +99,10 @@ class PartialsMostrarEstadoTicket extends Pagina{
         
         
     </script>
-            <?php if($dataUser['usuario_tipo']==1){
-                $administradores = isset($data['administradores'])?$data['administradores']:NULL;?>
+            <?php if($dataUser['usuario_tipo']==1 && ($dataUser['t']==$dataUser['sistema_id'])){
+                $administradores = isset($data['administradores'])?$data['administradores']:NULL;
+                //var_dump($administradores);
+                ?>
             <dl>               
                 <?php 
                 if($data['estado_id']==28){?>
@@ -125,7 +134,7 @@ class PartialsMostrarEstadoTicket extends Pagina{
                         </select>
                     </dd>
                         <dt>Asignado a:</dt>  
-                        <dd><?php echo "<p class='text-green'>".utf8_encode($data['asignado_a_usuario_id'])."</p>"?></dd>                    
+                        <dd><?php echo "<p class='text-green'>".($data['asignado_a'])."</p>"?></dd>                    
                     <dt>Fecha:</dt>
                     <dd><?php echo $this->FormatoFecha(date_format($data['fechaAsignado'], 'Y-m-d H:i:s'))?> | <?php echo substr(date_format($data['fechaAsignado'], 'Y-m-d H:i:s'), 11,5)?></dd>
                     <dt>Estado:</dt>                                                         
@@ -144,7 +153,7 @@ class PartialsMostrarEstadoTicket extends Pagina{
                 else if($data['estado_id']==30){
                     ?>                         
                     <dt>Atendido por:</dt>  
-                        <dd><?php echo "<p class='text-green'>".utf8_encode($data['asignado_a_usuario_id'])."</p>"?></dd>
+                        <dd><?php echo "<p class='text-green'>".($data['asignado_a'])."</p>"?></dd>
                     <dt>Fecha atendido:</dt>
                     <dd><?php echo $this->FormatoFecha(date_format($data['fechaAtendido'], 'Y-m-d H:i:s'))?> | <?php echo substr(date_format($data['fechaAtendido'], 'Y-m-d H:i:s'), 11,5)?></dd>                    
                     <dt>Estado:</dt>
@@ -171,7 +180,7 @@ class PartialsMostrarEstadoTicket extends Pagina{
                 else if($data['estado_id']==31){
                     ?>
                         <dt>Resuelto por:</dt>       
-                            <dd><?php echo "<p class='text-green'>".utf8_encode($data['atendido_por_usuario_id'])."</p>"?></dd>                        
+                            <dd><?php echo "<p class='text-green'>".($data['atendido_por'])."</p>"?></dd>                        
                         <dt>Fecha atendido:</dt>
                             <dd><?php echo $this->FormatoFecha(date_format($data['fechaAtendido'],"Y-m-d"))?> | <?php echo substr(date_format($data['fechaAtendido'],"Y-m-d H:i:s"), 11,5)?></dd>                    
                         <dt>Estado:</dt>
@@ -190,7 +199,7 @@ class PartialsMostrarEstadoTicket extends Pagina{
                             <?php }
                             else if($data['estado_id']==29){?>
                                 <dt>Asignado a:</dt>  
-                                <dd><?php echo "<p class='text-green'>".utf8_encode($data['asignado_a_usuario_id'])."</p>"?></dd>                                     
+                                <dd><?php echo "<p class='text-green'>".($data['asignado_a'])."</p>"?></dd>                                     
                                 <dt>Fecha:</dt>
                                 <dd><?php echo $this->FormatoFecha(date_format($data['fechaAsignado'], 'Y-m-d H:i:s'))?> | <?php echo substr(date_format($data['fechaAsignado'], 'Y-m-d H:i:s'), 11,5)?></dd>
                                 <dt>Estado:</dt>                                                         
@@ -209,7 +218,7 @@ class PartialsMostrarEstadoTicket extends Pagina{
                             else if($data['estado_id']==30){//var_dump($data['atendido_por_usuario_id']);
                                 ?>                         
                                 <dt>Atendido por:</dt>  
-                                    <dd><?php echo "<p class='text-green'>".utf8_encode($data['atendido_por_usuario_id'])."</p>"?></dd>
+                                    <dd><?php echo "<p class='text-green'>".($data['atendido_por'])."</p>"?></dd>
                                 <dt>Fecha atendido:</dt>
                                 <dd><?php echo $this->FormatoFecha(date_format($data['fechaAtendido'], $formato))?> | <?php echo substr(date_format($data['fechaAtendido'], $formato), 11,5)?></dd>                    
                                 <dt>Estado:</dt>
@@ -237,7 +246,7 @@ class PartialsMostrarEstadoTicket extends Pagina{
                             else if($data['estado_id']==31){
                                 ?>
                                     <dt>Resuelto por:</dt>       
-                                        <dd><?php echo "<p class='text-green'>".utf8_encode($data['atendido_por_usuario_id'])."</p>"?></dd>                        
+                                        <dd><?php echo "<p class='text-green'>".($data['atendido_por'])."</p>"?></dd>                        
                                     <dt>Fecha atendido:</dt>
                                     <dd><?php echo $this->FormatoFecha(date_format($data['fechaAtendido'], 'Y-m-d H:i:s'))?> | <?php echo substr(date_format($data['fechaAtendido'], 'Y-m-d H:i:s'), 11,5)?></dd>                    
                                     <dt>Estado:</dt>

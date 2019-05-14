@@ -6,6 +6,8 @@ class DataCN {
     const user = "";
     const password = "";
     const database = "";
+    
+
 
 
 }

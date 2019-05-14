@@ -7,7 +7,8 @@ class FormularioNuevoTicketView extends Pagina{
         
         $data['titulo'] = "Nuevo Ticket";
         $data['js']     = "jstree";
-        $dataUser['menu'] = "Ticket";
+        $dataUser['menu'] = $dataUser['t']==1 ? "Ticket":"HelpTools";
+        $data['dataUser']= $dataUser;
 
         $this->MostrarHead($data);
         ?>
@@ -67,6 +68,7 @@ class FormularioNuevoTicketView extends Pagina{
     }
         
     function MostrarPagina($data){
+        $dataUser=$data['dataUser'];
         ?>
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
@@ -111,7 +113,8 @@ class FormularioNuevoTicketView extends Pagina{
 <!-- the tree container (notice NOT an UL node) -->
 <!--<div id="demo" class="demo" style="height:200px;"></div>-->
 
-<input type="hidden" 	name="lugar_id" class="lugar_id" 	value="node_6">
+<input type="hidden" name="lugar_id" class="lugar_id" 	value="node_6">
+<input type="hidden" name="tipo_id" value="<?php echo $dataUser['t']?>" > 
 
   <script type="text/javascript" class="source below">
     $(function () {

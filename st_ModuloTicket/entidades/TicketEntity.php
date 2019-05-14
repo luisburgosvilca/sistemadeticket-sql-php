@@ -5,7 +5,7 @@ class TicketEntity extends Conexion{
     
     public function ConsultaBase(){
         
-        $q = "SELECT T.id, T.codigo, T.asunto, T.descripcion, T.estado_id, T.registrado_por_usuario_id, ISNULL(P.Nombres, NULL) as registrado_por, T.ip_registro, T.fechaRegistro, T.asignado_a_usuario_id, ISNULL(P2.Nombres,NULL) as asignado_a, T.fechaAsignado, T.asignado_por_usuario_id, ISNULL(P3.Nombres,NULL) as asignado_por, T.fechaAsignado, T.atendido_por_usuario_id, ISNULL(P4.Nombres,NULL) as atendido_por, T.fechaAtendido, T.confirmado_por_usuario_id, ISNULL(P5.Nombres,NULL) as confirmado_por, T.fechaConfirmado, L.title as lugar, DATEDIFF(SECOND, T.fechaRegistro,T.fechaAtendido) as tiempo_solucion 
+        $q = "SELECT T.id, T.codigo, T.asunto, T.descripcion, T.estado_id, T.registrado_por_usuario_id, ISNULL(P.Nombres, NULL) as registrado_por, T.ip_registro, T.fechaRegistro, T.asignado_a_usuario_id, ISNULL(P2.Nombres,NULL) as asignado_a, T.fechaAsignado, T.asignado_por_usuario_id, ISNULL(P3.Nombres,NULL) as asignado_por, T.fechaAsignado, T.atendido_por_usuario_id, ISNULL(P4.Nombres,NULL) as atendido_por, T.fechaAtendido, T.confirmado_por_usuario_id, ISNULL(P5.Nombres,NULL) as confirmado_por, T.fechaConfirmado, L.title as lugar, DATEDIFF(SECOND, T.fechaRegistro,T.fechaAtendido) as tiempo_solucion, T.sistema_id 
                         FROM st_ticket T
                             left join [ONCO].[SYS_USUARIOS] U on T.registrado_por_usuario_id = U.USUARIO
                             left join [Spring_Produccion].[dbo].[PersonaMast] P on U.PERSONA = P.Persona --registrado por
@@ -23,10 +23,10 @@ class TicketEntity extends Conexion{
         
     }
     
-    public function ObtenerTickets(){
+    public function ObtenerTickets($tipo_id){
         
         $conn = $this->AbrirConexion();
-            $query = $this->ConsultaBase()." order by T.fechaRegistro DESC";
+            $query = $this->ConsultaBase()." where T.sistema_id='$tipo_id' order by T.fechaRegistro DESC";
             //$result = mysqli_query($Conexion, $query) or die(mysqli_errno($Conexion).": ". mysqli_error($Conexion));
             $result = sqlsrv_query($conn,$query) or die('Error x1: TicketEntity');
             if($result===false){
@@ -67,6 +67,7 @@ class TicketEntity extends Conexion{
         //$usuario_id     = $dataUser['usuario_id'];
         $usuario        = $dataUser['USUARIO'];
         //$persona        = $dataUser['PERSONA'];
+        $tipo_id        = $data['tipo_id'];
         $lugar_id       = $data['lugar_id'];
         $ip             = $data['ip'];
         $hostname       = $data['hostname'];
@@ -77,8 +78,8 @@ class TicketEntity extends Conexion{
 //        echo $nuevo; // &lt;a href=&#039;test&#039;&gt;Test&lt;/a&gt;
         
         $conn = $this->AbrirConexion();
-            $query = "INSERT INTO st_ticket (asunto,descripcion,registrado_por_usuario_id,lugar_id,ip_registro,hostname_registro,so_registro,fechaRegistro)
-                     VALUES ('$asunto','$descripcion','$usuario','$lugar_id','$ip','$hostname','$os',getdate())";
+            $query = "INSERT INTO st_ticket (asunto,descripcion,registrado_por_usuario_id,lugar_id,ip_registro,hostname_registro,so_registro,fechaRegistro,sistema_id)
+                     VALUES ('$asunto','$descripcion','$usuario','$lugar_id','$ip','$hostname','$os',getdate(),'$tipo_id')";
             //$result = mysqli_query($Conexion, $query) or die(mysqli_errno($Conexion).": ".mysqli_error($Conexion));
             $result = sqlsrv_query($conn,$query) or die("Error x3: TicketEntity: ");
             
@@ -173,14 +174,14 @@ class TicketEntity extends Conexion{
 
     }
     
-    function ObtenerAdministradores(){
+    function ObtenerAdministradores($sistema_id){
         
         $conn = $this->AbrirConexion();
 
-            $query = "SELECT U.USUARIO, U.PERSONA, P.Nombres as admin FROM [ONCO].[SYS_USUARIOS] U 
+            $query = "SELECT U.USUARIO, U.PERSONA, P.Nombres, P.ApellidoPaterno, isnull(parsename(replace(P.Nombres,' ','.'),2),parsename(replace(P.Nombres,' ','.'),1))+' '+P.ApellidoPaterno as admin FROM [ONCO].[SYS_USUARIOS] U 
                         inner join [Spring_Produccion].[dbo].[PersonaMast] P on U.PERSONA=P.Persona
                         inner join st_persona P1 on U.PERSONA=P1.PERSONA
-                                  where P1.tipo_id ='1'";
+                                  where P1.tipo_id ='1' and P1.sistema_id='$sistema_id'";
             $result = sqlsrv_query($conn,$query, array(), array('Scrollable' => 'buffered')) or die("Error x5");
             //$result = mysqli_query($cn,$query) or die(mysqli_errno($cn).': '.mysqli_error($cn));
 
@@ -325,15 +326,14 @@ class TicketEntity extends Conexion{
             }else{
                 $data = NULL;
             }
-            
-            
+                        
             return ($data);
             
         $this->CerrarConexion($result, $conn);        
         
     }
     
-    function ObtenerTicketsData($result){   
+    function ObtenerTicketsData($result){
     
         
         $i = 0;

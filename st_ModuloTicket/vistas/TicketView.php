@@ -8,7 +8,7 @@ class TicketView extends Pagina{
         $data['titulo'] = "Tickets";
         $data['js']     = "tabla-dinamica";
         $data['dataUser'] = $dataUser;
-        $dataUser['menu'] = "Ticket";
+        $dataUser['menu'] = $dataUser['t']==1 ? "Ticket":"HelpTools";
 
         $this->MostrarHead($data);
         ?>
@@ -25,12 +25,13 @@ class TicketView extends Pagina{
         <script>
             $(document).ready(function(){
                 var usuario_id = $("#usuario_id").val();
+                var t          = $("#t").val();
                 
                 CargarTickets();
                 
                 function CargarTickets(){
                     //console.log(1);
-                   $("#tickets").load("../st_Moduloticket/getTicket.php",{'mostrar_tickets': 'mostrar_tickets',usuario_id:usuario_id});
+                   $("#tickets").load("../st_Moduloticket/getTicket.php",{'mostrar_tickets': 'mostrar_tickets',usuario_id:usuario_id,'t':t});
                 }
                 
                     var intercal = setInterval(function()
@@ -67,6 +68,7 @@ class TicketView extends Pagina{
             <div class="box-header">
                 <form name="nuevo_ticket" action="../st_ModuloTicket/getTicket.php" method="POST">       
                     <input type="hidden" id="usuario_id" value="<?php echo $dataUser['usuario_id']?>" />
+                    <input type="hidden" id="t" name="t" value="<?php echo $dataUser['t']?>" />
                     <h3 class="box-title">Tickets Registrados <input type="submit" name="nuevo_ticket" value="Nuevo" class="btn btn-warning"></h3>
                 </form>
             </div>

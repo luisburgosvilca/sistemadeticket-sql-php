@@ -40,7 +40,13 @@ class UsuarioController extends RecursosController
                                     //var_dump($dataUsuario['Persona']);
                                     $dataUser['ApellidoPaterno'] = $dataUsuario['ApellidoPaterno'];
                                     $dataUser['ApellidoMaterno'] = $dataUsuario['ApellidoMaterno'];
-                                    $dataUser['Nombres']         = $dataUsuario['Nombres'];
+                                    $dataUser['Nombres']         = $dataUsuario['Nombres'];                                    
+                                    
+                                    $parte = explode(" ",$dataUser['Nombres']); 
+                                    $dataUser['Nombres'] = $parte[0]; 
+                                    
+                                    $dataUser['CorreoElectronico']=$dataUsuario['CorreoElectronico']; 
+                                    $dataUser['sistema_id']      = $dataUsuario['sistema_id'];
                                 
                                     $dataUser['usuario_nombre'] = ucfirst(strtolower($dataUser['Nombres']))." ".ucfirst(strtolower($dataUser['ApellidoPaterno']));    
                                 }else{
@@ -55,18 +61,20 @@ class UsuarioController extends RecursosController
                                 $_SESSION['usuario_id']     = $dataUser['usuario_id'];
                                 $_SESSION['usuaruio_tipo']  = $dataUser['usuario_tipo'];
                                 $_SESSION['USUARIO']        = $dataUser['USUARIO'];
-                                $_SESSION['Persona']        = $dataUser['Persona'];        
+                                $_SESSION['Persona']        = $dataUser['Persona'];
+                                $_SESSION['CorreoElectronico']= $dataUser['CorreoElectronico'];
+                                $_SESSION['sistema_id']     = $dataUser['sistema_id'];
                                 
                                 include_once ('../st_ModuloSeguridad/vistas/Dashboard.php');
                                 $ObjView = new Dashboard;
-                                $ObjView ->MostrarDashboard($dataUser);            
+                                $ObjView ->MostrarDashboard($dataUser);
                                                                 
                             }
                             else{
                                 $mensaje['foto']        = "../st_includes/img/doctor.png";
-                                $mensaje['nombre_usuario'] = utf8_encode($usu['nombre'].' '.$usu['apellido']);
-                                $mensaje['username']    = $usu['username'];
-                                $mensaje['descripcion'] = "Error en la contraseña.<br>Escríbalo nuevamente para ingresar, por favor";
+                                $mensaje['nombre_usuario'] = utf8_encode($dataUser['NOMBRE']);
+                                $mensaje['username']    = $dataUser['USUARIO'];
+                                $mensaje['descripcion'] = "Error en la contraseña.<br>Escríbalo nuevamente para ingresar, verifique mayúsculas o minúsculas por favor";
                             }
 
 
@@ -97,7 +105,9 @@ class UsuarioController extends RecursosController
             $ObjView ->MostrarDashboard($dataUser);             
         }
         
-        public function ObtenerResumenTickets($dataUser){            
+        public function ObtenerResumenTickets(){   
+            
+            $dataUser=$this->getUsuario();
                        
             include_once('../st_ModuloSeguridad/entidades/UsuarioTicket.php');
             $UsuarioTicekt = new UsuarioTicket();

@@ -2,7 +2,7 @@
 
 session_start();
 if(isset($_POST['mostrar_tickets']) && isset($_SESSION['usuario_id'])){
-    //echo "Aliada";
+    //echo $_REQUEST['t'];
         include_once('../st_ModuloTicket/controles/TicketController.php');
         $TicketController = new TicketController;
         $TicketController -> MostrarTicketsGrilla();

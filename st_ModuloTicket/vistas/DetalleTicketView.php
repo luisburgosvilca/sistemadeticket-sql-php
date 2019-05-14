@@ -7,13 +7,13 @@ class DetalleTicketView extends Pagina{
         //var_dump($data);
         $data['titulo'] = "Detalle Ticket";
         $data['js']     = "select2";
-        $dataUser['menu'] = "Ticket";
+        $dataUser['menu'] = $dataUser['t']==1 ? "Ticket":"HelpTools";
 
         $this->MostrarHead($data);
         ?>
 <!--        <script src="https://cdn.ckeditor.com/ckeditor5/12.0.0/classic/ckeditor.js"></script>-->
 
-        <script src="http://cdn.ckeditor.com/4.11.4/full/ckeditor.js"></script>
+        <script src="https://cdn.ckeditor.com/4.11.4/full/ckeditor.js"></script>
         
   
         <?php
@@ -73,14 +73,15 @@ class DetalleTicketView extends Pagina{
 			
                             var admin_id    = $("#asignar_administrador").val();
                                 usuario_id  = $("#usuario_id").val();
-                                ticket_id   = $("#ticket_id").val();                                
-                                //alert(admin_id);
+                                ticket_id   = $("#ticket_id").val();    
+                                sistema_id  = $("#sistema_id").val();
+                                //alert(sistema_id);
                             $("#estado_ticket_admin").html("<center><img class='img img-responsive' width='80%' src='../st_includes/img/loader.gif' /> Asignando administrador a ticket</center>");
                                 $.ajax({
                                     type:       'POST',
                                     dataType:   'html',
                                     url:        '../st_ModuloTicket/getTicket.php',
-                                    data:       {admin_id:admin_id, usuario_id: usuario_id,ticket_id:ticket_id},
+                                    data:       {admin_id:admin_id, usuario_id: usuario_id,ticket_id:ticket_id, sistema_id:sistema_id },
                                     success: function(respuesta){
                                         $("#estado_ticket_admin").html(respuesta);
                                     }
@@ -93,6 +94,7 @@ class DetalleTicketView extends Pagina{
                     $("#marcar_como_resuelto").click(function(){
                         var usuario_id = $("#usuario_id").val();
                         var ticket_id = $("#ticket_id").val();
+                        var sistema_id  = $("#sistema_id").val();
                         var confirmation = confirm("¿Desea Marcar este ticket como resuelto?");
                         if(confirmation){
                             $("#estado_ticket_admin").html("<center><img class='img img-responsive' width='80%' src='../st_includes/img/loading_pacman.gif' /> Esperando confirmación de usuario</center>");
@@ -100,7 +102,7 @@ class DetalleTicketView extends Pagina{
                                     type:       'POST',
                                     dataType:   'html',
                                     url:        '../st_ModuloTicket/getTicket.php',
-                                    data:       {marcar_resuelto:'marcar_resuelto', usuario_id: usuario_id,ticket_id:ticket_id},
+                                    data:       {marcar_resuelto:'marcar_resuelto', usuario_id: usuario_id,ticket_id:ticket_id,sistema_id:sistema_id},
                                     success: function(wait_for_confirmation){
                                         $("#estado_ticket_admin").html(wait_for_confirmation);
                                     }
@@ -111,6 +113,7 @@ class DetalleTicketView extends Pagina{
                     $("#confirmar_solucion").click(function(){
                         var usuario_id = $("#usuario_id").val();
                         var ticket_id = $("#ticket_id").val();
+                        var sistema_id  = $("#sistema_id").val();
                         var confirmation = confirm("¿Desea confirmar la solución de este Ticket?");
                         
                         if(confirmation){
@@ -119,7 +122,7 @@ class DetalleTicketView extends Pagina{
                                     type:       'POST',
                                     dataType:   'html',
                                     url:        '../st_ModuloTicket/getTicket.php',
-                                    data:       {confirmar_resuelto:'confirmar_resuelto', usuario_id: usuario_id,ticket_id:ticket_id},
+                                    data:       {confirmar_resuelto:'confirmar_resuelto', usuario_id: usuario_id,ticket_id:ticket_id,sistema_id:sistema_id},
                                     success: function(wait_for_confirmation){
                                         $("#estado_ticket_admin").html(wait_for_confirmation);
                                     }
@@ -133,6 +136,8 @@ class DetalleTicketView extends Pagina{
                         var codigo      = $("#codigo").val();
                         var asunto      = $("#asunto").val();
                         var descripcion = $("#descripcion").val();
+                        var sistema_id  = $("#sistema_id").val();
+                        
                         var confirmation = confirm("¿Informar que no está resuelto el Ticket?");   
                         
                         if(confirmation){
@@ -141,7 +146,7 @@ class DetalleTicketView extends Pagina{
                                     type:       'POST',
                                     dataType:   'html',
                                     url:        '../st_ModuloTicket/getTicket.php',
-                                    data:       {negar_resuelto:'negar_resuelto', usuario_id: usuario_id,ticket_id:ticket_id,codigo:codigo,asunto:asunto,descripcion:descripcion},
+                                    data:       {negar_resuelto:'negar_resuelto', usuario_id: usuario_id,ticket_id:ticket_id,codigo:codigo,asunto:asunto,descripcion:descripcion, sistema_id:sistema_id},
                                     success: function(wait_for_confirmation){
                                         $("#estado_ticket_admin").html(wait_for_confirmation);
                                     }
@@ -175,8 +180,9 @@ class DetalleTicketView extends Pagina{
                     function VerEstadoTicekt(){
                         var estado_id = $("#estado_id").val();
                             ticket_id = $("#ticket_id").val();
+                            sistema_id = $("#sistema_id").val();
                         //$("#estado_resultado").load("../st_ModuloTicket/getTicket.php",{cambio_estado:'cambio_estado',ticket_id:ticket_id,estado_id:estado_id});
-                        $("#estado_ticket_admin").load("../st_ModuloTicket/getTicket.php",{estado_ticket_admin:'estado_ticket_admin',ticket_id:ticket_id,estado_id:estado_id});
+                        $("#estado_ticket_admin").load("../st_ModuloTicket/getTicket.php",{estado_ticket_admin:'estado_ticket_admin',ticket_id:ticket_id,estado_id:estado_id,sistema_id:sistema_id});
                     }
 
                     $(function() {
@@ -273,7 +279,7 @@ class DetalleTicketView extends Pagina{
                                       <?php echo $file[$i]['size_kb']?>
                                       <a href="<?php echo $file[$i]['url_file']?>" class="btn btn-default btn-xs pull-right" download="<?php echo $file[$i]['nombre']?>"><i class="fa fa-cloud-download"></i></a>
                                     </span>
-            </div>
+                              </div>
                             </li>                            
                             
                         <?php                        
@@ -390,6 +396,7 @@ class DetalleTicketView extends Pagina{
                             <input type="hidden" id="estado_id"  value="<?php echo $data['estado_id']?>">
                             <input type="hidden" id="asunto"     value="<?php echo utf8_encode($data['asunto'])?>">
                             <input type="hidden" id="descripcion" value="<?php echo utf8_encode($data['descripcion'])?>">
+                            <input type="hidden" id="sistema_id" value="<?php echo $dataUser['t']?>">
                             
                             <button id="registrar" name="enviar_comentario" class="btn btn-success">Enviar</button>
                         </center>
@@ -441,7 +448,7 @@ class DetalleTicketView extends Pagina{
                           <div id="estado_ticket_admin">
                             <dl> 
                           <?php //admin
-                          if($dataUser['usuario_tipo']==1){
+                          if($dataUser['usuario_tipo']==1 && ($dataUser['t']==$dataUser['sistema_id'])){
                              /////////////////////////////////////////////////////                        
                             $administradores = isset($data['administradores'])?$data['administradores']:NULL;   
                             //var_dump($administradores);

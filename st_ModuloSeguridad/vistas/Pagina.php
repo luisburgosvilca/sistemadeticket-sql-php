@@ -47,9 +47,6 @@ class Pagina
         }
   ?>
 
-
-
-
   <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
   <!--[if lt IE 9]>
@@ -93,7 +90,7 @@ class Pagina
           <li class="dropdown user user-menu">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
               <img src="../st_includes/dist/img/user2-160x160.jpg" class="user-image" alt="User Image">
-              <span class="hidden-xs"><?php echo utf8_encode($dataUser['usuario_nombre'])?></span>
+              <span class="hidden-xs"><?php echo ($dataUser['usuario_nombre'])?></span>
             </a>
             <ul class="dropdown-menu">
               <!-- User image -->
@@ -101,7 +98,7 @@ class Pagina
                 <img src="../st_includes/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
 
                 <p>
-                  <?php echo $dataUser['usuario_tipo']=='1'? "Administrador":"Usuario" ?>: <?php echo utf8_encode($dataUser['usuario_nombre'])?>
+                  <?php echo $dataUser['usuario_tipo']=='1'? "Administrador":"Usuario" ?>: <?php echo ($dataUser['usuario_nombre'])?>
                   <!--<small>Member since Nov. 2012</small>-->
                 </p>
               </li>
@@ -143,7 +140,7 @@ class Pagina
           <img src="../st_includes/dist/img/user2-160x160.jpg" class="img-circle" alt="User Image">
         </div>
         <div class="pull-left info">
-            <p><?php echo utf8_encode($dataUser['usuario_nombre'])?></p>
+            <p><?php echo ($dataUser['usuario_nombre'])?></p>
           <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
         </div>
       </div>
@@ -162,13 +159,23 @@ class Pagina
         </li>
         
         <li class="<?php echo $dataUser['menu']=='Ticket'?'active':'' ?>">
-          <a href="../st_ModuloTicket/">
+          <a href="../st_ModuloTicket/index.php?t=1">
             <i class="fa fa-th"></i> <span><?php echo $m=$dataUser['usuario_tipo']==1?'Tickets':'Mis Tickets'?></span>
             <span class="pull-right-container">
               <!--<small class="label pull-right bg-green">new</small>-->
             </span>
           </a>
         </li>
+        
+        <li class="<?php echo $dataUser['menu']=='HelpTools'?'active':'' ?>">
+          <a href="../st_ModuloTicket/index.php?t=2">
+            <i class="fa fa-life-bouy"></i> <span><?php echo $m=$dataUser['usuario_tipo']==1?'HelpTools':'Mi HelpTools'?></span>
+            <span class="pull-right-container">
+              <!--<small class="label pull-right bg-green">new</small>-->
+            </span>
+          </a>
+        </li>
+        
         <li class="<?php echo $dataUser['menu']=='CartasDeGarantia'?'active':'' ?>">
           <a href="../st_ModuloCartasDeGarantia/">
             <i class="fa fa-files-o"></i> <span>Cartas de Garantía</span>

@@ -38,7 +38,7 @@ class Dashboard extends Pagina
             include_once('../st_ModuloSeguridad/controles/UsuarioController.php');
             $usuario_ticket = new UsuarioController();    
             
-            $this->MostrarDatosDashboard($usuario_ticket->ObtenerResumenTickets($dataUser))?>
+            $this->MostrarDatosDashboard($usuario_ticket->ObtenerResumenTickets())?>
         <?php //$this->MostrarInformacionAdicionalDashboard()?>
         
         <div class="row">

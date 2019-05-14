@@ -40,11 +40,13 @@ class FormularioAutenticacion //extends AnotherClass
 <div class="login-box">
   <div class="login-logo">
     <!--<a href=""><b>Sistema de Tickets</b></a>-->
+    <img class="img-responsive" style="margin-top: -45%;" src="st_includes/img/logo_aliada2.png">
     <br>
     <br>
   </div>
   <!-- /.login-logo -->
-  <div class="login-box-body">
+  
+  <div class="login-box-body" style="margin-top: -26%;">
     <p class="login-box-msg">Sistema de Tickets</p>
 
 

@@ -13,10 +13,22 @@ class TicketController extends RecursosController{
         return $data;
     }
     
-    public function MostrarTickets(){
+    public function EsAdmin($persona,$dataUser){
+        
+        include_once('../st_ModuloSeguridad/entidades/Usuario.php');
+        $Usuario = new Usuario();
+        $user = $Usuario->EsAdministrador($persona, $dataUser);
+        
+        return $user['sistema_id'];
+    }
+    
+    public function MostrarTickets($t){
         
         $dataUser=$this->getUsuario();
-                       
+        $dataUser['t']=$t;
+        
+        $dataUser['sistema_id'] = $this->EsAdmin($dataUser['Persona'],$dataUser);
+        
         include_once('../st_ModuloTicket/vistas/TicketView.php');
         $TicketView = new TicketView();
         $TicketView -> MostrarTickets($dataUser);
@@ -25,12 +37,13 @@ class TicketController extends RecursosController{
     public function MostrarTicketsGrilla(){
         
         $dataUser = $this->getUsuario();
+        $dataUser['t'] = $_REQUEST['t'];
         
         include_once('../st_ModuloTicket/entidades/TicketEntity.php');
         $TicketEntity = new TicketEntity;
         
         if($dataUser['usuario_tipo']==1){
-            $tickets = $TicketEntity->ObtenerTickets();
+            $tickets = $TicketEntity->ObtenerTickets($dataUser['t']);
         }else{
             $tickets = $TicketEntity->ObtenerTicketsUsuario($dataUser);
         }   
@@ -44,6 +57,7 @@ class TicketController extends RecursosController{
     public function FormularioNuevoTicket(){
         
         $dataUser=$this->getUsuario();
+        $dataUser['t'] = $_REQUEST['t'];
         
         include_once ('../st_ModuloTicket/vistas/FormularioNuevoTicketView.php');
         $FormularioNuevoTicketView = new FormularioNuevoTicketView;
@@ -56,17 +70,20 @@ class TicketController extends RecursosController{
         $dataUser=$this->getUsuario();
         $data=$this->getDatosTransaccion($dataUser);
         
+        $ticket_id = $_POST['ticket_id'];
+        
         $data['asunto']     = addslashes($_POST['asunto']);
         $data['descripcion']= htmlspecialchars(addslashes($_POST['descripcion']));
         $data['lugar_id']   = substr($_POST['lugar_id'], 5);//settype(substr($_POST['lugar_id'], 5), INTEGER);
-       
+        $data['tipo_id']    = $_REQUEST['tipo_id'];
+        //die($_REQUEST['tipo_id']);
         include_once('../st_ModuloSeguridad/vistas/Mensaje.php');
         $Mensaje = new Mensaje();
         //var_dump($data);
         //var_dump($data);
         include_once ('../st_ModuloTicket/entidades/TicketEntity.php');
         $TicketEntity = new TicketEntity;
-        //registrar imagen        
+        //registrar imagen
         if($data['ticket_id'] = $TicketEntity -> RegistrarTicket($data,$dataUser)){
             //echo $data['ticket_id'];
             $data['codigo'] = $TicketEntity->RegistrarCodigo($data['ticket_id']);           
@@ -78,7 +95,8 @@ class TicketController extends RecursosController{
                                    </p>';
             $TicketEntity->RegistrarComentario($data, $dataUser);
             ///Acción 3: Notificar vía Mail
-            $this->EnviarEmail($data);
+            $data['usuario_nombre'] = $dataUser['usuario_nombre'];
+            //$this->EnviarEmail($data);
             ///Acción 4: Registrar para Notificar a Administradores
             /////////////////////////
             $data['count'] = count($_FILES['archivo']['tmp_name']);
@@ -93,7 +111,6 @@ class TicketController extends RecursosController{
             $mensaje['descripcion'] = $resultado;
             $mensaje['clase']       = "warning";
         }
-        
             }else{
                 $mensaje['descripcion'] = "Se registró el ticket satisfactoriamente.";
                 $mensaje['clase']       = "success";
@@ -109,6 +126,7 @@ class TicketController extends RecursosController{
     public function DetalleTicket(){
         
         $dataUser = $this->getUsuario();
+        $dataUser['t'] = $_REQUEST['t'];
         
         $ticket_id = $_POST['ticket_id'];
         
@@ -132,7 +150,7 @@ class TicketController extends RecursosController{
         $data['files'] = $TicketEntity->ObtenerArchivosAdjuntos($ticket_id);
         
         if($dataUser['usuario_tipo']==1){            
-            $data['administradores'] = $TicketEntity->ObtenerAdministradores();            
+            $data['administradores'] = $TicketEntity->ObtenerAdministradores($dataUser['t']);            
         }
         //var_dump($data['files'][0]['extension']);
         include_once('../st_ModuloTicket/vistas/DetalleTicketView.php');
@@ -213,14 +231,17 @@ class TicketController extends RecursosController{
         
         $dataUser = $this->getUsuario();
         $data = $this->getDatosTransaccion($dataUser);
-        //var_dump($_POST['admin_id']);
+        
+        $dataUser['t'] = $_REQUEST['sistema_id'];
+        
+        //var_dump($dataUser['sistema_id']);
         $data['admin_id']   = $_POST['admin_id'];
         //var_dump($data['admin_id']);
         //var_dump($data['estado_id']);
         include_once('../st_ModuloTicket/entidades/TicketEntity.php');
         $TicketEntity = new TicketEntity();
         if($TicketEntity -> AsignarAdministradorATicket($data,$dataUser)){
-            echo $data['admin_id'].'-'.$dataUser['USUARIO'];
+            //echo $data['admin_id'].'-'.$dataUser['USUARIO'];
             /////////////////////////////////
             //Informar Asignacion de Ticekt
             //1. Registrar Comentario marcado
@@ -237,7 +258,7 @@ class TicketController extends RecursosController{
             
 
             $data = $TicketEntity ->DetalleTicket($data['ticket_id'], $dataUser);
-            $data['administradores'] = $TicketEntity->ObtenerAdministradores();            
+            $data['administradores'] = $TicketEntity->ObtenerAdministradores($dataUser['sistema_id']);            
         
         include_once('../st_ModuloTicket/vistas/partials/PartialsMostrarEstadoTicket.php');
         $PartialsAdminAssignedToTicket = new PartialsMostrarEstadoTicket();
@@ -270,6 +291,8 @@ class TicketController extends RecursosController{
         
         $dataUser = $this->getUsuario();
         $data=$this->getDatosTransaccion($dataUser);
+        
+        $dataUser['t'] = $_REQUEST['sistema_id'];
 
         include_once('../st_ModuloTicket/entidades/TicketEntity.php');
         $TicketEntity = new TicketEntity();
@@ -279,6 +302,7 @@ class TicketController extends RecursosController{
         
         if($TicketEntity ->MarcarComoResuelto($data,$dataUser)){
             
+            $data['administradores'] = $TicketEntity->ObtenerAdministradores($dataUser['sistema_id']);    //
             ///Acciones:
             //1. Registrar Comentario marcado
             $data['comentario'] = '<p>
@@ -298,6 +322,8 @@ class TicketController extends RecursosController{
         
         $dataUser = $this->getUsuario();
         $data = $this->getDatosTransaccion($dataUser);
+        
+        $dataUser['t'] = $_REQUEST['sistema_id'];
         
         include_once('../st_ModuloTicket/entidades/TicketEntity.php');
         $TicketEntity = new TicketEntity();
@@ -325,13 +351,19 @@ class TicketController extends RecursosController{
         
         $dataUser = $this->getUsuario();        
         $data = $this->getDatosTransaccion($dataUser);
+        
+        $dataUser['t'] = $_REQUEST['sistema_id'];
+        
+        include_once('../st_ModuloTicket/entidades/TicketEntity.php');
+        $TicketEntity = new TicketEntity();
+        
+           
+        
         //en esta parte resolver para que el administrador pueda ver el estado de cada ticket
         $data['codigo'] = $_POST['codigo'];
         $data['asunto'] = $_POST['asunto'];
         $data['descripcion'] = $_POST['descripcion'];
         
-        include_once('../st_ModuloTicket/entidades/TicketEntity.php');
-        $TicketEntity = new TicketEntity();
         if($TicketEntity->NegarSolucionTicket($data,$dataUser)){
             
             ///Acciones:
@@ -343,6 +375,7 @@ class TicketController extends RecursosController{
             //2. Enviar Email                  
          
             $data = $TicketEntity->DetalleTicket($data['ticket_id'], $dataUser);
+            $data['administradores'] = $TicketEntity->ObtenerAdministradores($dataUser['sistema_id']);     
             
             include_once('../st_ModuloTicket/vistas/partials/PartialsMostrarEstadoTicket.php');
             $PartialsMostrarEstadoTicket = new PartialsMostrarEstadoTicket();
@@ -375,6 +408,8 @@ class TicketController extends RecursosController{
         
         $dataUser = $this->getUsuario();
         
+        $dataUser['t'] = $_REQUEST['sistema_id'];
+        
         $data['ticket_id'] = $_POST['ticket_id'];
         $data['estado_id'] = $_POST['estado_id'];
         
@@ -382,7 +417,7 @@ class TicketController extends RecursosController{
         $TicketEntity = new TicketEntity();
         $data = $TicketEntity->DetalleTicket($data['ticket_id'], $dataUser);   
         
-        $data['administradores']= $TicketEntity->ObtenerAdministradores();
+        $data['administradores']= $TicketEntity->ObtenerAdministradores($dataUser['t']);
         
         include_once('../st_ModuloTicket/vistas/partials/PartialsMostrarEstadoTicket.php');
         $PartialsMostrarCambioDeEstadoDeTicket = new PartialsMostrarEstadoTicket();

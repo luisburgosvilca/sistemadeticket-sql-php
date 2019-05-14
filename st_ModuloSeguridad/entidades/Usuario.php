@@ -45,7 +45,9 @@ Class Usuario extends Conexion{
         
         $conn = $this->AbrirConexion();
         
-            $query = "select * from [Spring_Produccion].[dbo].[PersonaMast] where Persona='$persona'";
+            $query = "select P1.sistema_id, P.* from [Spring_Produccion].[dbo].[PersonaMast] P
+                        inner join dbo.st_persona P1 on P.Persona=P1.PERSONA
+                                where P1.PERSONA='$persona'";
             $result = sqlsrv_query($conn, $query) or die("Error x3: Usuario<br>".sqlsrv_errno($conn).': '.sqlsrv_error($conn));
             
             return sqlsrv_fetch_array($result);
@@ -58,10 +60,10 @@ Class Usuario extends Conexion{
         
         $conn = $this->AbrirConexion();
         
-            $query = "SELECT tipo_id FROM dbo.st_persona WHERE PERSONA='$persona'";
+            $query = "SELECT tipo_id, sistema_id FROM dbo.st_persona WHERE PERSONA='$persona'";
             $result = sqlsrv_query($conn,$query) or die("Error x4: Usuario<br>".sqlsrv_errno($conn).': '.sqlsrv_error($conn));
         
-            return sqlsrv_fetch_array($result);   
+            return sqlsrv_fetch_array($result);
             
             $this->CerrarConexion($result, $conn);
             

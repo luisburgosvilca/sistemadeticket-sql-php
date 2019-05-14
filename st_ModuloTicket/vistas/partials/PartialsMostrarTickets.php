@@ -64,6 +64,8 @@ class PartialsMostrarTickets extends Pagina{
                       <form name="ver_ticket" action="../st_ModuloTicket/getTicket.php" method="POST">
                           <button type="submit" class="btn btn-warning btn-xs" name="ver_ticket"><i class="fa fa-file-text-o"></i></button>
                           <input type="hidden" name="ticket_id" value="<?php echo $ticket[$i]['id']?>">
+                          <input type="hidden" name="tipo_id" value="<?php echo $ticket[$i]['ticket_id']?>">
+                          <input type="hidden" id="t" name="t" value="<?php echo $dataUser['t']?>" />
                           
                           <?php
                           if($dataUser['USUARIO']==$ticket[$i]['registrado_por_usuario_id']){

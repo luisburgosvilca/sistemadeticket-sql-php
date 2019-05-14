@@ -27,10 +27,10 @@ class CartaEntity extends Conexion{
         
         $conn = $this->AbrirConexion();
         
-            $query = "SELECT C.*, EC.descripcion as estado FROM cdg_cartas C
-                        inner join cdg_estadocarta EC on C.estado_id=EC.id
+            $query = "SELECT C.*, EC.descripcion as estado FROM st_carta C
+                        inner join st_cartaEstado EC on C.estado_id=EC.id
                             order by fecha desc";
-            $result = sqlsrv_query($conn,$query) or die('Error x2: '.sqlsrv_errno($conn).' - '.sqlsrv_error($conn));
+            $result = sqlsrv_query($conn,$query) or die('Error x2: ');
             
             $i=0;
             $data=NULL;
@@ -48,7 +48,7 @@ class CartaEntity extends Conexion{
             return $data;
             
         $this->DestruirDatos($result);
-        $this->CerrarConexion($conn);        
+        $this->CerrarConexion($conn);
         
     }
     
@@ -64,8 +64,8 @@ class CartaEntity extends Conexion{
             
             $i=0;
             while($carta = sqlsrv_fetch_array($result)){
-                $data[$i]['persona']        = $carta['Persona'];              
-                $data[$i]['td']             = ($carta['TD']) ;
+                $data[$i]['persona']        = $carta['Persona'];            
+                $data[$i]['td']             = ($carta['TD']);
                 $data[$i]['documento']      = ($carta['Documento']);
                 $data[$i]['nombre']         = ($carta['Nombre']);
                 $data[$i]['sexo']           = $carta['SEXO'];
@@ -74,7 +74,7 @@ class CartaEntity extends Conexion{
                 $data[$i]['fechanacimiento']= $carta['FechaNacimiento'];
                 $data[$i]['telefono']       =  $carta['Telefono'];
                 $data[$i]['edad']           =  $carta['Edad'];
-                $i++;                 
+                $i++;
             }               
             return (isset($data)?$data:NULL);
  
