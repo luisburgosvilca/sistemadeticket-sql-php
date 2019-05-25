@@ -5,16 +5,17 @@ class UsuarioTicket extends Conexion {
     
     var $estado = "28','29','30','31";
     
-    function getEstados(){
-        return $this->estado;
-    }
+//    function getEstados(){
+//        return $this->estado;
+//    }
     
     function ObtenerResumenTickets($dataUser){
         
+        $sistema_id = $dataUser['t'];
+        
         $conn = $this->AbrirConexion();
         
-            $query = "
-SELECT E.ESTADO_REGISTRO as id, E.descripcion, (select count(*) from dbo.st_ticket T where T.estado_id=E.ESTADO_REGISTRO) as cantidad from [ONCO].[SYS_ESTADO_REGISTRO] E where E.ESTADO_REGISTRO IN('$this->estado')";
+            $query = "SELECT E.ESTADO_REGISTRO as id, E.descripcion, (select count(*) from dbo.st_ticket T where T.estado_id=E.ESTADO_REGISTRO and T.sistema_id in ('$sistema_id')) as cantidad from [ONCO].[SYS_ESTADO_REGISTRO] E where E.ESTADO_REGISTRO IN('$this->estado')";
             //$result = mysqli_query($cn,$query) or die(mysqli_errno($cn).": ".mysqli_error($cn));
             $result = sqlsrv_query($conn,$query) or die("Error x1: UsuarioTicket");
                         

@@ -1,7 +1,7 @@
 <?php
 
 @session_start();
-    if($_SESSION['usuario_id']){
+    if($_SESSION['USUARIO']){
         include_once('../st_ModuloCartasDeGarantia/controles/CartasController.php');
         $CartasController = new CartasController();
         $CartasController -> MostrarCartas();

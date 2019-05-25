@@ -55,6 +55,8 @@ class RecursosController extends Pagina
         }
         
         public function getUsuario(){
+            
+            date_default_timezone_set("America/Lima");
 
             $dataUser['usuario_nombre'] = $_SESSION['usuario_nombre'];
             $dataUser['usuario_id']     = $_SESSION['usuario_id'];
@@ -91,15 +93,15 @@ class RecursosController extends Pagina
                     if($_FILES["archivo"]["size"][$key]/(1024*1024) <= $limite_mb){
                         
                         $data['size_kb'] = round($_FILES["archivo"]["size"][$key]/1024,3);
-                        $data['nombre'] = $_FILES["archivo"]["name"][$key];
+                        $data['nombre'] = ($_FILES["archivo"]["name"][$key]);
                         /////////
-                       
+                        //var_dump($data['nombre']);
                         $data['extension'] = ($this->ObtenerExtensionDeArchivo($data['nombre']));
                         ////////
                         $data['fechaRegistro'] = $this->FechaHoraLima();
                         $data['nombreRegistro'] = $data['codigo'].'_'.$data['fechaRegistro'].'_'.$key.'.'.$data['extension'];
-                        $source = $_FILES["archivo"]["tmp_name"][$key];
-
+                        $source = ($_FILES["archivo"]["tmp_name"][$key]);
+                        //var_dump($source);
                         $data['directorio'] = "../st_includes/files/".$data['codigo'].'/';
 
                         if(!file_exists($data['directorio'])){
@@ -108,7 +110,7 @@ class RecursosController extends Pagina
 
                         $dir=opendir($data['directorio']); //Abrimos el directorio de destino
                         $data['target_path'] = $data['directorio'].$data['nombre']; //Indicamos la ruta de destino, así como el nombre del archivo
-
+                        //var_dump($data['target_path']);
                         if(@move_uploaded_file($source, $data['target_path'])){
                             
                             if($Archivo->RegistrarArchivo($data,$dataUser)){
@@ -250,6 +252,17 @@ class RecursosController extends Pagina
             return $mensaje;
             
         }
+        
+    public function getDatosTransaccion($dataUser){
+                
+        $data['usuario_id'] = isset($_POST['usuario_id'])?$_POST['usuario_id']:$dataUser['usuario_id'];//$dataUser['usuario_id'];//
+        $data['ticket_id']  = isset($_POST['ticket_id'])?$_POST['ticket_id']:NULL;
+        $data['hostname']   = $this->getHostName();
+        $data['so']         = $this->getSistemaOperativo();
+        $data['ip']         = $this->getUserIpAddr();        
+        
+        return $data;
+    }        
 }
 
 ?>

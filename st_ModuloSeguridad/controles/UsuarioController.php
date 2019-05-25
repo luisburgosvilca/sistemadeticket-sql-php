@@ -65,6 +65,8 @@ class UsuarioController extends RecursosController
                                 $_SESSION['CorreoElectronico']= $dataUser['CorreoElectronico'];
                                 $_SESSION['sistema_id']     = $dataUser['sistema_id'];
                                 
+                                $dataUser['t']="1','2";
+                                
                                 include_once ('../st_ModuloSeguridad/vistas/Dashboard.php');
                                 $ObjView = new Dashboard;
                                 $ObjView ->MostrarDashboard($dataUser);
@@ -96,18 +98,18 @@ class UsuarioController extends RecursosController
         
         public function MostrarDashboard(){
             
-            $dataUser['usuario_nombre'] = $_SESSION['usuario_nombre'];
-            $dataUser['usuario_id']     = $_SESSION['usuario_id'];
-            $dataUser['usuario_tipo']   = $_SESSION['usuaruio_tipo']; 
-        
+            $dataUser = $this->getUsuario();
+            
+            $dataUser['t']="1','2";
+            
             include_once ('../st_ModuloSeguridad/vistas/Dashboard.php');
             $ObjView = new Dashboard;
             $ObjView ->MostrarDashboard($dataUser);             
         }
         
-        public function ObtenerResumenTickets(){   
+        public function ObtenerResumenTickets($dataUser){   
             
-            $dataUser=$this->getUsuario();
+            //$dataUser=$this->getUsuario();
                        
             include_once('../st_ModuloSeguridad/entidades/UsuarioTicket.php');
             $UsuarioTicekt = new UsuarioTicket();

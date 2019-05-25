@@ -1,18 +1,7 @@
 <?php
 include_once("../st_ModuloSeguridad/controles/RecursosController.php");
 class TicketController extends RecursosController{
-    
-    public function getDatosTransaccion($dataUser){
-                
-        $data['usuario_id'] = isset($_POST['usuario_id'])?$_POST['usuario_id']:$dataUser['usuario_id'];//$dataUser['usuario_id'];//
-        $data['ticket_id']  = isset($_POST['ticket_id'])?$_POST['ticket_id']:NULL;
-        $data['hostname']   = $this->getHostName();
-        $data['so']         = $this->getSistemaOperativo();
-        $data['ip']         = $this->getUserIpAddr();        
-        
-        return $data;
-    }
-    
+       
     public function EsAdmin($persona,$dataUser){
         
         include_once('../st_ModuloSeguridad/entidades/Usuario.php');
@@ -70,7 +59,7 @@ class TicketController extends RecursosController{
         $dataUser=$this->getUsuario();
         $data=$this->getDatosTransaccion($dataUser);
         
-        $ticket_id = $_POST['ticket_id'];
+        //$ticket_id = $_POST['ticket_id'];
         
         $data['asunto']     = addslashes($_POST['asunto']);
         $data['descripcion']= htmlspecialchars(addslashes($_POST['descripcion']));

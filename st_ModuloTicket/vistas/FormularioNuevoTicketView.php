@@ -20,7 +20,7 @@ class FormularioNuevoTicketView extends Pagina{
 	<link type="text/css" rel="stylesheet" href="../st_includes/jstree/_docs/syntax/!style.css"/>
 	<link type="text/css" rel="stylesheet" href="../st_includes/jstree/_docs/!style.css"/>
   <script type="text/javascript" src="../st_includes/jstree/_docs/syntax/!script.js"></script>
-<script src="//cdn.ckeditor.com/4.11.4/full/ckeditor.js"></script>
+<script src="https://cdn.ckeditor.com/4.11.4/full/ckeditor.js"></script>
 <!--<script src="../st_includes/js/ckeditor.js"></script>-->
   
   
@@ -94,7 +94,7 @@ class FormularioNuevoTicketView extends Pagina{
               <div class="box-body">
                 <div class="form-group">
                   <label for="exampleInputEmail1">Asunto</label>
-                  <input type="text" name="asunto" class="form-control" required="" placeholder="Indique motivo">
+                  <input type="text" name="asunto" autofocus="" class="form-control" required="" placeholder="Indique motivo">
                 </div>
                 <div class="form-group">
                   <label>Descripción</label>

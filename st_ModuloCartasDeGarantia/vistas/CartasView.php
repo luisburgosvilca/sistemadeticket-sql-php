@@ -3,9 +3,9 @@
 include_once('../st_ModuloSeguridad/vistas/Pagina.php');
 class TicketView extends Pagina{
     
-    public function MostrarCartas($dataUser){
+    public function MostrarCartas($data,$dataUser){
         
-        $data['titulo'] = "Cartas";
+        $data['titulo'] = "Cartas de Garantía";
         $data['js']     = "tabla-dinamica datepicker";
         $data['dataUser'] = $dataUser;
         $dataUser['menu'] = "CartasDeGarantia";
@@ -14,14 +14,16 @@ class TicketView extends Pagina{
         ?>
   <!-- DataTables -->
   <link rel="stylesheet" href="../st_includes/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css">
-  <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.37/css/bootstrap-datetimepicker.min.css" />
+  <link rel="stylesheet" href="../st_includes/css/CartasView.css">  
+  
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 <!--  <script src="../st_includes/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>-->
-  <style>
-      .modal-body{
-        max-height: calc(100vh - 210px);
-        overflow-y: auto;
-      }
-  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+  <script src="../st_includes/js/bootstrap-datetimepicker.js" type="text/javascript"></script>
+  
+  
+
 <?php
         $this->MostrarHeader($dataUser);
         $this->MostrarMenu($dataUser);
@@ -31,87 +33,7 @@ class TicketView extends Pagina{
         $this->MostrarScripts($data);
         ?>
   
-        <script>
-            $(document).ready(function(){
-                var usuario_id = $("#usuario_id").val();
-                
-                CargarCartasDeGarantia();                
-                
-                $("#registrar").click(function() {
-
-                    var usuario = $("#usuario").val();
-                        nombre  = $("#nombre").val();
-                        seguro  = $("#seguro").val();
-                        fecha   = $("#datepicker").val();
-                        estado  = $("#estado").val();
-                        carta   = $("#carta").val();
-                   //console.log(usuario);
-
-                        LimpiarCampos();
-
-                    $("#CartasDeGarantia").html("<center><img class='img img-responsive' width='80%' src='../st_includes/img/loading.gif' /> Registrando</center>");
-                        $.ajax({
-                            type:       'POST',
-                            dataType:   'html',
-                            url:        '../st_ModuloCartasDeGarantia/getCartas.php',
-                            data:       {registrar_carta:'registrar_carta', usuario: usuario, nombre:nombre, seguro:seguro, fecha:fecha, estado: estado, carta:carta},
-                            success: function(wait_for_confirmation){
-                                $("#CartasDeGarantia").html(wait_for_confirmation);
-                            }
-                        }); 
-                });     
-                
-                function CargarCartasDeGarantia(){
-                    //console.log(1);
-                   $("#CartasDeGarantia").load("../st_ModuloCartasDeGarantia/getCartas.php",{'mostrar_cartas': 'mostrar_cartas',usuario_id:usuario_id});
-                }
-                
-        
-                function LimpiarCampos(){
-
-                    document.getElementById("usuario").value="";
-                    document.getElementById("nombre").value="";
-                    document.getElementById("seguro").value="";
-                    document.getElementById("datepicker").value="";
-                    document.getElementById("estado").value="";
-                    document.getElementById("carta").value="";
-
-                }                
-                
-                var intercal = setInterval(function()
-                {
-                 CargarCartasDeGarantia();
-                },10000);   
-//                
-//                $(function(){
-//                    //Date picker
-//                    $('#datepicker').datepicker({ format: 'yyyy-mm-dd', autoclose: true})
-//                })
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                $(function() {
-                    $('.pop').on('click', function() {
-                        //$('.imagepreview').attr('src', $(this).find('img').attr('src'));
-                        $('#imagemodal').modal('show');   
-                    });		
-                });
-                
-                $("#buscar_paciente").click(function(){
-                    var nombre = $("#buscar_nombre").val();
-                    //alert(codigo);
-                    $("#resultado_buscar_paciente").html("<img height='100%' class='img img-responsive center-block' src='../st_includes/img/loading.gif' /> <p class='text-center'>Buscando: "+nombre+" </p><img class='img img-responsive center-block' src='../st_includes/img/logo_aliada.png'>");
-                        $.ajax({
-                            type:       'POST',
-                            dataType:   'html',
-                            url:        '../st_ModuloCartasDeGarantia/getCartas.php',
-                            data:       {buscar_paciente:'buscar_paciente', nombre: nombre},
-                            success: function(wait_for_confirmation){
-                                $("#resultado_buscar_paciente").html(wait_for_confirmation);
-                            }
-                        }); 
-                });
-
-            });
-        </script>
+  <script src="../st_includes/js/CartasView.js"></script>    
         <?php        
         
     }
@@ -125,76 +47,152 @@ class TicketView extends Pagina{
       <?php $this->MostrarTitulo($data)?>
       
     <!-- Main content -->
-<section class="content">
+    <section class="content">
       <div class="row">
         <!-- left column -->
         <div class="col-md-12">
           <!-- general form elements -->
-          <div class="box box-primary">
+          <div class="box">
             <div class="box-header with-border">
                 <div class="form-group">
                     <div class="row">
                         <div class="col-xs-2 ">
                          <div class="form-group">                             
-                            <button type="submit" id="buscar" class="btn btn-info pop">Buscar</button>
+                             <button id="form_buscar_paciente" class="btn btn-info"><i class="fa fa-search-plus"></i> Buscar Paciente</button>
                          </div>
                         </div>
                     </div>
+                    
                     <div class="row">                                                                         
-                      <div class="col-xs-1">
+                      <div class="col-md-2 col-sm-6">
                          <div class="form-group">
                           <label>Usuario</label>
-                          <input readonly="" type="text" class="form-control" id="usuario" placeholder="Usuario">
+                            <div class='input-group'>
+                                <input readonly="" required="" type="text" class="form-control" id="usuario" placeholder="Usuario">
+                                <span class="input-group-addon glyphicon-disabled">
+                                    <span class="glyphicon glyphicon-user"></span>
+                                </span>                                
+                            </div>
                          </div>
                       </div>
-                      <div class="col-xs-2">
+                      <div class="col-md-3 col-sm-6">
                         <div class="form-group">
-                          <label>Nombre</label>                          
-                          <input readonly="" type="text" class="form-control"  id="nombre" placeholder="Nombre y Apellido">
+                          <label>Paciente</label>
+                          <div class='input-group'>
+                            <input readonly="" required="" type="text" class="form-control"  id="nombrePaciente" placeholder="Nombre y Apellido">
+                            <span class="input-group-addon glyphicon-disabled">
+                                <span class="fa fa-user-plus"></span>
+                            </span>  
+                          </div>
+                         </div>
+                      </div>
+                      <div class="col-md-5 col-sm-6">
+                         <div class="form-group">
+                          <label>Seguro</label>
+                          <div class='input-group'>
+                          <input readonly="" type="text" required="" class="form-control" id="aseguradora" placeholder="Compañia de Seguro">
+                            <span class="input-group-addon glyphicon-disabled">
+                                <span class="fa fa-ambulance"></span>
+                            </span>                            
+                          </div>
+                         </div>
+                      </div>
+                      <div class="col-md-2 col-sm-6">
+                        <div class="form-group">
+                            <label>Fecha de Ingreso</label>
+                            <div class='input-group date fechaRegistro'>
+                                <input type='text' data-date-format="YYYY-MM-DD HH:mm" placeholder="Fecha ingreso" class="form-control" id="fechaRegistro" />
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
                         </div>
+                          <script>
+                                $('#fechaRegistro').datetimepicker(); 
+
+                                $('#fechaRegistro input').click(function(){
+                                    $('#fechaRegistro').data("DateTimePicker").show();
+                                 });                           
+                                 
+                                 $('.fechaRegistro').datetimepicker();
+                          </script>
                       </div>
-                      <div class="col-xs-2">
-                         <div class="form-group">
-                          <label>Seguro</label>                          
-                        <input readonly="" type="text" class="form-control" id="seguro" placeholder="Compañia de Seguro">
-                         </div>
-                      </div>
-                      <div class="col-xs-2">
-                         <div class="form-group">
-                          <label>Fecha Registro</label>
-                          <input type="text" class="form-control pull-right" placeholder="Fecha de Registro" id="datepicker">                          
-                         </div>
-                      </div>
-                      <div class="col-xs-2">
+                      <div class="col-md-2 col-sm-6">
                         <div class="form-group">
                           <label>Estado</label>
-                          <select id="estado" class="form-control">
-                            <option value="1">Aprobado</option>
-                            <option value="2">Observado</option>
-                            <option value="3">Rechazado</option>
-                          </select>
+                          <div class='input-group'>
+                            <select id="estado_id" class="form-control">
+                                <?php 
+                                    foreach ($data['estados'] as $estado){
+                                        ?>
+                                      <option value="<?php echo $estado['estado_id']?>"><?php echo $estado['descripcion']?></option>
+                                        <?php
+                                    }
+                                ?>
+                            </select>
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-scale"></span>
+                            </span>                              
+                          </div>
                         </div>                                                    
                       </div>
-                      <div class="col-xs-2">
+                      <div class="col-md-3 col-sm-6">
                         <div class="form-group">
-                          <label>N° Carta</label>                          
-                          <input type="text" class="form-control" id="carta" placeholder="N° Carta">
+                          <label>N° Carta</label> 
+                          <div class='input-group'>
+                            <input type="text" class="form-control" id="nrocarta" placeholder="N° Carta">
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-file"></span>
+                            </span>                             
+                          </div>
                         </div>
+                      </div>
+                      <div class="col-md-4 col-sm-6">
+                        <div class="form-group">
+                          <label>Tratamiento</label> 
+                          <div class='input-group'>
+                            <input type="text" class="form-control" id="tratamiento" placeholder="Tratamiento">
+                            <span class="input-group-addon">
+                                <span class="fa fa-medkit"></span>
+                            </span>                             
+                          </div>
                         </div>
-                        <div class="col-xs-1 ">
+                      </div>
+                      <div class="col-md-1 col-sm-6">
+                        <div class="form-group">
+                          <label>Es Urgente</label> 
+                          <div class="checkbox">
+                            <label>
+                                <input id="esUrgente" type="checkbox">Urgente
+                            </label>
+                          </div>
+                        </div>
+                        </div>                        
+                        <div class="col-md-2 col-sm-6 ">
                          <div class="form-group">
                              <label style="color:white"> . </label> 
-                            <button type="submit" id="registrar" class="btn btn-warning">Registrar</button>
+                             <input type="hidden" name="IdAseguradora" id="IdAseguradora" value=""/> 
+                             <input type="hidden" name="paciente" id="paciente" value="">
+                             <input type="hidden" name="IdGarantia" id="IdGarantia" value="">
+                             <br>
+                            <button type="submit" id="registrar" class="btn btn-primary btn-block"><i class="fa fa-h-square"></i>   Registrar</button>
                          </div>
                         </div>                        
                     </div>                     
                 </div>              
             </div>
             <!-- /.box-header -->
+          </div>
+        </div>
+      </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box">
+            
             <!-- form start -->
      
-              <div class="box-body">
-                <div id="CartasDeGarantia"></div>                
+              <div class="box-body">               
+                  <div id="CartasDeGarantia"></div>                
               </div>
               <!-- /.box-body -->
 
@@ -205,58 +203,55 @@ class TicketView extends Pagina{
           </div>
           <!-- /.box -->
           
-                        <div class="modal fade bs-example-modal-lg" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-lg">
-                            <div class="modal-content">  
-                            <div class="modal-header">
-                              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                <br>
-                                    <div class="col-xs-3 col-xs-offset-1">
-                                        <div class="form-group">
-                                            <h4 class="modal-title text-right" id="gridSystemModalLabel"><u>Buscar Paciente: </u></h4>    
-                                        </div>
-                                            
-                                    </div>
-                                    
-                                    <div class="col-xs-5">
-                                        <div class="form-group">
-                                            
-                                            <input type="text" class="form-control" required="required" id="buscar_nombre">
-                                        </div>
-                                    </div>
-                                    <div class="col-xs-2 ">
-                                        <div class="form-group">
-                                            <button id="buscar_paciente" class="btn btn-success">Buscar</button>
-                                        </div>
-                                    </div>  
-                                
-                            </div>                                
-                            <div class="modal-body">
+            <div class="modal fade bs-example-modal-lg" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                <div class="modal-content">  
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <br>
+                        <div class="col-xs-3 col-xs-offset-1">
+                            <div class="form-group">
+                                <h4 class="modal-title text-right" id="gridSystemModalLabel"><u>Buscar Paciente: </u></h4>    
+                            </div>
 
-                                <div id="resultado_buscar_paciente">
-                                    <img class="img img-responsive center-block" src="../st_includes/img/logo_aliada.png">
-                                </div>
-                               
+                        </div>
+
+                        <div class="col-xs-5">
+                            <div class="form-group">
+
+                                <input type="text" id="buscar_nombre" class="form-control" autofocus="" required="required" >
                             </div>
-                            <div class="modal-footer">
-                              <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                              <!--<button type="button" class="btn btn-primary">Asignar</button>-->
-                            </div>                                
+                        </div>
+                        <div class="col-xs-2 ">
+                            <div class="form-group">
+                                <button id="buscar_paciente" class="btn btn-success"><i class="fa fa-search-plus"></i> Buscar</button>
                             </div>
-                          </div>
-                        </div>             
+                        </div>  
+
+                </div>                                
+                <div class="modal-body">                                      
+
+                    <div id="resultado_buscar_paciente">
+                        <img class="img img-responsive center-block" src="../st_includes/img/logo_aliada.png">
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-close"></i> Cerrar</button>
+                  <!--<button type="button" class="btn btn-primary">Asignar</button>-->
+                </div>                                
+                </div>
+              </div>
+            </div>             
 
         </div>
-        <!--/.col (left) -->
-        
+        <!--/.col (left) -->        
       </div>
       <!-- /.row -->
     </section>
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
-            <?php
-        
-    }
-    
+            <?php        
+    } 
 }

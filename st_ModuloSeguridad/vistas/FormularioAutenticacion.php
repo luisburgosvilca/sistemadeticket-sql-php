@@ -52,7 +52,7 @@ class FormularioAutenticacion //extends AnotherClass
 
     <form action="st_ModuloSeguridad/getSecurity.php" method="post">
       <div class="form-group has-feedback">
-          <input type="username" class="form-control" name="username" required="" placeholder="Nombre de usuario">
+          <input type="username" autofocus="" class="form-control" name="username" required="" placeholder="Nombre de usuario">
         <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
       </div>
       <div class="form-group has-feedback">

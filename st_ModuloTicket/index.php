@@ -1,7 +1,7 @@
 <?php
 
 @session_start();
-    if($_SESSION['usuario_id']){
+    if($_SESSION['USUARIO']){
         
         $t = isset($_REQUEST['t']) ? $_REQUEST['t']:1;
         //var_dump($t);
