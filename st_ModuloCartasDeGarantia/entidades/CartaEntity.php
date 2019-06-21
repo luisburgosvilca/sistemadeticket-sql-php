@@ -4,6 +4,7 @@ include_once('../st_ModuloSeguridad/Conexion.php');
 class CartaEntity extends Conexion{
     
     var $estado = "4','8','27','33";
+    //4:  Pendiente
     //8:  Aprobado
     //27: Observado
     //33: Rechazado
@@ -17,14 +18,21 @@ class CartaEntity extends Conexion{
             $IdEmpresaAseguradora=$data['IdEmpresaAseguradora'];
             $aseguradora    = $data['aseguradora'];
             $fechaRegistro  = $data['fechaRegistro'];
+            $fechaAprobado  = $data['fechaAprobado'];
             $estado_id      = $data['estado_id'];
             $nrocarta       = $data['nrocarta'];    
             $tratamiento    = $data['tratamiento'];
             $esUrgente      = $data['esUrgente'];
             $IdGarantia     = $data['IdGarantia'];
 
-            $query = "INSERT INTO st_carta (usuario,paciente,nombrePaciente,IdEmpresaAseguradora,aseguradora,fechaRegistro,estado_id,nrocarta,tratamiento, esUrgente, IdGarantia,fecha) VALUES 
-                             ('$usuario','$paciente','$nombrePaciente','$IdEmpresaAseguradora','$aseguradora','$fechaRegistro','$estado_id','$nrocarta','$tratamiento','$esUrgente','$IdGarantia',GETDATE())";
+            if($fechaAprobado==NULL){
+                $query = "INSERT INTO st_carta (usuario,paciente,nombrePaciente,IdEmpresaAseguradora,aseguradora,fechaRegistro,fechaAprobado,estado_id,nrocarta,tratamiento, esUrgente, IdGarantia,fecha) VALUES 
+                    ('$usuario','$paciente','$nombrePaciente','$IdEmpresaAseguradora','$aseguradora','$fechaRegistro',NULL,'$estado_id','$nrocarta','$tratamiento','$esUrgente','$IdGarantia',GETDATE())";                
+            }else{
+                $query = "INSERT INTO st_carta (usuario,paciente,nombrePaciente,IdEmpresaAseguradora,aseguradora,fechaRegistro,fechaAprobado,estado_id,nrocarta,tratamiento, esUrgente, IdGarantia,fecha) VALUES 
+                    ('$usuario','$paciente','$nombrePaciente','$IdEmpresaAseguradora','$aseguradora','$fechaRegistro','$fechaAprobado','$estado_id','$nrocarta','$tratamiento','$esUrgente','$IdGarantia',GETDATE())";                
+            }
+            //echo $query;
             $result = sqlsrv_query($conn,$query) or die('Error x1: CartaEntity');
             
             return $result;
@@ -37,11 +45,12 @@ class CartaEntity extends Conexion{
         
         $conn = $this->AbrirConexion();
         
-            $query = "SELECT C.*, ER.DESCRIPCION as estado,A.NombreCompleto as nombre_aseguradora, P.NombreCompleto as nombre_paciente FROM st_carta C
-                        inner join [ONCO].[SYS_ESTADO_REGISTRO] ER on C.estado_id=ER.ESTADO_REGISTRO
-                        inner JOIN Spring_Produccion.dbo.PersonaMast A ON A.Persona = C.IdEmpresaAseguradora
-                        inner JOIN Spring_Produccion.dbo.PersonaMast P ON P.Persona = C.paciente
-                            order by C.fecha desc";
+            $query = "SELECT C.*, ER.DESCRIPCION as estado,A.NombreCompleto as nombre_aseguradora, P.NombreCompleto as nombre_paciente, DATEDIFF(MINUTE, C.fechaRegistro, C.fechaAprobado) as tiempo_aprobacion
+                        FROM st_carta C
+                            inner join [ONCO].[SYS_ESTADO_REGISTRO] ER on C.estado_id=ER.ESTADO_REGISTRO
+                            inner JOIN Spring_Produccion.dbo.PersonaMast A ON A.Persona = C.IdEmpresaAseguradora
+                            inner JOIN Spring_Produccion.dbo.PersonaMast P ON P.Persona = C.paciente
+                                order by C.fecha desc";
             $result = sqlsrv_query($conn,$query, array(), array('Scrollable' => 'buffered')) or die('Error x2: ');
             
             //var_dump(($result));
@@ -63,6 +72,7 @@ class CartaEntity extends Conexion{
                 $data[$i]['fechaAprobado']  = is_null($carta['fechaAprobado'])?'':date_format($carta['fechaAprobado'],"Y-m-d H:i:s");
                 $data[$i]['estado_id']      = $carta['estado_id'];
                 $data[$i]['esUrgente']      = $carta['esUrgente'];
+                $data[$i]['tiempo_aprobacion']= $carta['tiempo_aprobacion'];
                 //$data[$i]['esUrgenteCheck'] = $carta['esUrgente'];
                 $i++;
             }
@@ -112,13 +122,15 @@ class CartaEntity extends Conexion{
                         IdGarantia,
                         G.FechaInicioGarantia,
                         IdEmpresaAseguradora,
-                        A.NombreCompleto as aseguradora
-                        FROM Spring_Produccion.dbo.SS_AD_Garantia G
-                                RIGHT JOIN Spring_Produccion.dbo.PersonaMast P
+                        A.NombreCompleto as aseguradora,
+                        G.EstadoDocumento
+                            FROM Spring_Produccion.dbo.SS_AD_Garantia G
+                                left JOIN Spring_Produccion.dbo.PersonaMast P
                                         ON P.Persona = G.IdPaciente
-                                RIGHT JOIN Spring_Produccion.dbo.PersonaMast A
+                                left JOIN Spring_Produccion.dbo.PersonaMast A
                                         ON A.Persona = G.IdEmpresaAseguradora
-                                        where P.Persona ='$persona'";
+                                        where P.Persona ='$persona' 
+                                        order by G.FechaInicioGarantia DESC";
             $result = sqlsrv_query($conn,$query, array(), array('Scrollable' => 'buffered')) or die('Error x4: ');
             
             //echo '->'.var_dump(sqlsrv_num_rows($result)).'<-';
@@ -126,7 +138,7 @@ class CartaEntity extends Conexion{
                 $i=0;
                 while($carta = sqlsrv_fetch_array($result)){
                     $data[$i]['IdGarantia']             = $carta['IdGarantia'];              
-                    $data[$i]['FechaInicioGarantia']    = is_null($carta['FechaInicioGarantia'])? 'No Registrado': date_format($carta['FechaInicioGarantia'],"Y-m-d");
+                    $data[$i]['FechaInicioGarantia']    = is_null($carta['FechaInicioGarantia'])? '': date_format($carta['FechaInicioGarantia'],"Y-m-d");
                     $data[$i]['IdEmpresaAseguradora']   = ($carta['IdEmpresaAseguradora']);
                     $data[$i]['aseguradora']            = ($carta['aseguradora']);
                     $i++;                 
@@ -185,7 +197,7 @@ class CartaEntity extends Conexion{
         
         $conn = $this->AbrirConexion();
             
-            $query = "UPDATE st_carta set nrocarta='$nrocarta', estado_id='$estado_id',tratamiento='$tratamiento',esUrgente='$esUrgente', $fechaIngresado,$fechaAprobado where id='$id'";
+            echo $query = "UPDATE st_carta set nrocarta='$nrocarta', estado_id='$estado_id',tratamiento='$tratamiento',esUrgente='$esUrgente', $fechaIngresado,$fechaAprobado where id='$id'";
             $result = sqlsrv_query($conn,$query,array(), array('Scrollable' => 'buffered')) or die('Error x5: ');              
             
             return $result;

@@ -2,11 +2,10 @@
 
 class DataCN {
     
-    const servername = "";
-    const user = "";
-    const password = "";
-    const database = "";
-
+     const servername = "";
+     const user = "";
+     const password = "";
+     const database = "";
 
 
 

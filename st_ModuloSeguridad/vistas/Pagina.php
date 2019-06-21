@@ -184,6 +184,15 @@ class Pagina
               <!--<small class="label pull-right bg-green">new</small>-->
             </span>
           </a>
+        </li>  
+        
+        <li class="<?php echo $dataUser['menu']=='Publicaciones'?'active':'' ?>">
+          <a href="../st_ModuloPublicaciones/">
+            <i class="fa fa-files-o"></i> <span>Publicaciones</span>
+            <span class="pull-right-container">
+              <!--<small class="label pull-right bg-green">new</small>-->
+            </span>
+          </a>
         </li>         
 
 
@@ -1283,6 +1292,32 @@ class Pagina
             }            
             
             return $r;
+        }
+        
+        public function ObtenerTiempoDeAprobacion($t){
+            
+            if($t<60){
+                $r=$t.' min';
+            }else if($t<1440){                
+               
+                $r= floor($t/60);
+                $min=($t%60);
+                $r=$r.' h '.$min. ' min';   
+                
+            }
+            else{
+                $r=($t/1440);
+                $dr=$r- floor($r);
+                $r= floor($r);
+                $h=$dr*24;
+                $dh=$h-floor($h);
+                $m=$dh*60;
+                $r= $r.' d '.floor($h).' h '.round($m).' min';
+                //$r=$t;
+            }
+            
+            return $r;
+            
         }
         
 }

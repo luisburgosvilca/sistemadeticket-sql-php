@@ -62,7 +62,7 @@ class MostrarCartasDeGarantiaDePacientePartials{
     });
     
     function LimpiarCampos(){
-        document.getElementById("usuario").value = "";
+        //document.getElementById("usuario").value = "";
         document.getElementById("nombrePaciente").value = "";
         document.getElementById("aseguradora").value = "";
         document.getElementById("IdAseguradora").value = "";

@@ -47,9 +47,16 @@ elseif(isset($_REQUEST['actualizarFechaAprobacion']) && isset($_SESSION['USUARIO
     
     include_once('../st_ModuloCartasDeGarantia/controles/CartasController.php');
     $ControlCarta = new CartasController();
-    $ControlCarta ->ActualizarFechaAprobación();
+    $ControlCarta ->ActualizarFechaAprobacion();
+    
+}
+elseif(isset ($_REQUEST['actualizarFechaAprobacion3']) && isset ($_SESSION['USUARIO'])){
+ 
+    include_once('../st_ModuloCartasDeGarantia/controles/CartasController.php');
+    $ControlCarta = new CartasController();
+    $ControlCarta ->ActualizarFechaAprobacion();
     
 }
 else{
-    echo "algo sucedió";
+    echo "algo sucedió, vuelva a iniciar sesión";
 }

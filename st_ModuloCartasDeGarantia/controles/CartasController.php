@@ -4,16 +4,23 @@ class CartasController extends RecursosController{
     
     public function RegistrarCarta(){
         
+        $dataUser=$this->getUsuario();
+        
         include_once('../st_ModuloCartasDeGarantia/entidades/CartaEntity.php');
         $cartaEntity = new CartaEntity();
         
-            $data['usuario']        = $_POST['usuario'];
+            //4:  Pendiente
+            //8:  Aprobado
+            //27: Observado
+            //33: Rechazado        
+            $data['usuario']        = $dataUser['USUARIO'];
             $data['paciente']       = $_POST['paciente'];
             $data['nombrePaciente'] = $_POST['nombrePaciente'];
             $data['IdEmpresaAseguradora']= $_POST['IdAseguradora'];
             $data['aseguradora']    = $_POST['aseguradora'];
             $data['fechaRegistro']  = $_POST['fechaRegistro'];
             $data['estado_id']      = $_POST['estado_id'];
+            $data['fechaAprobado']  = ($data['estado_id']!=8)?NULL:$_POST['fechaAprobado'];
             $data['nrocarta']       = $_POST['nrocarta'];
             $data['tratamiento']    = $_POST['tratamiento'];
             $data['esUrgente']      = $_POST['esUrgente'];
@@ -82,11 +89,11 @@ class CartasController extends RecursosController{
         $dataUser = $this->getUsuario();
               
         include_once('../st_ModuloCartasDeGarantia/entidades/CartaEntity.php');
-        $CartaEntity = new CartaEntity();
-        $data['cartas'] = $CartaEntity->BuscarCartasDePaciente($_POST['paciente']);
-        $data['paciente'] = $_POST['paciente'];
+        $CartaEntity            = new CartaEntity();
+        $data['cartas']         = $CartaEntity->BuscarCartasDePaciente($_POST['paciente']);
+        $data['paciente']       = $_POST['paciente'];
         $data['nombrePaciente']  = $_POST['nombrePaciente'];
-        $data['fecha']   = date("Y-m-d H:i:s");
+        $data['fecha']          = date("Y-m-d H:i:s");
         
         include_once('../st_ModuloCartasDeGarantia/vistas/Partials/MostrarCartasDeGarantiaDePacientePartials.php');
         $MostrarCartasDeGarantiaPartials = new MostrarCartasDeGarantiaDePacientePartials();
@@ -125,13 +132,13 @@ class CartasController extends RecursosController{
         //$data[]
         
         include_once('../st_ModuloCartasDeGarantia/entidades/CartaEntity.php');
-        $cartaEntity = new CartaEntity();   
+        $cartaEntity = new CartaEntity();
         
-        $data = $cartaEntity ->ActualizarEstadoCarta($data, $dataUser);        
+        $data = $cartaEntity ->ActualizarEstadoCarta($data, $dataUser);
         
     }
     
-    public function ActualizarFechaAprobación(){
+    public function ActualizarFechaAprobacion(){
         
         $dataUser = $this->getUsuario();  
         $data =$this->getDatosTransaccion($dataUser);

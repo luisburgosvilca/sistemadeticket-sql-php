@@ -117,7 +117,9 @@ class RecursosController extends Pagina
                                $i++; 
                             }                            
                         } else {	
-                            ?><script>alert("Ha ocurrido un error en el archivo: "<?php echo $data['nombre']?>)</script><?php
+                            ?>
+<!--                    <script>alert("Ha ocurrido un error en el archivo: "<?php echo $data['nombre']?>)</script>-->
+                                <?php
                             return "Ha ocurrido un error en el archivo: ".$data['nombre'];
                         }
                         closedir($dir);                         
@@ -262,7 +264,18 @@ class RecursosController extends Pagina
         $data['ip']         = $this->getUserIpAddr();        
         
         return $data;
-    }        
+    }
+    
+    //fuente]: https://www.bufa.es/funcion-php-urls-amigables/
+    function url_amigable($cadena) {
+        $acentos   = array('À', 'Á', 'Â', 'Ã', 'Ä', 'Å', 'Æ',  'Ç', 'È', 'É', 'Ê', 'Ë', 'Ì', 'Í', 'Î', 'Ï', 'Ð', 'Ñ', 'Ò', 'Ó', 'Ô', 'Õ', 'Ö', 'Ø', 'Ù', 'Ú', 'Û', 'Ü', 'Ý', 'ß', 'à', 'á', 'â', 'ã', 'ä', 'å', 'æ',  'ç', 'è', 'é', 'ê', 'ë', 'ì', 'í', 'î', 'ï', 'ð', 'ñ', 'ò', 'ó', 'ô', 'õ', 'ö', 'ø', 'ù', 'ú', 'û', 'ü', 'ý', 'þ', 'ÿ');
+        $noacentos = array('A', 'A', 'A', 'A', 'A', 'A', 'AE', 'C', 'E', 'E', 'E', 'E', 'I', 'I', 'I', 'I', 'D', 'N', 'O', 'O', 'O', 'O', 'O', 'O', 'U', 'U', 'U', 'U', 'Y', 'B', 'a', 'a', 'a', 'a', 'a', 'a', 'ae', 'c', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'o', 'n', 'o', 'o', 'o', 'o', 'o', 'o', 'u', 'u', 'u', 'u', 'y', 'p', 'y');
+        $slug = str_replace($acentos, $noacentos, $cadena);
+        $slug = strtolower($slug);
+        $slug = str_replace(" ", "-", $slug);
+        $slug = preg_replace('/[^A-Za-z0-9\-]/', '', $slug);
+        return $slug;
+    }
 }
 
 ?>

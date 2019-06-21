@@ -58,23 +58,25 @@ class TicketView extends Pagina{
                     <div class="row">
                         <div class="col-xs-2 ">
                          <div class="form-group">                             
-                             <button id="form_buscar_paciente" class="btn btn-info"><i class="fa fa-search-plus"></i> Buscar Paciente</button>
+                             <button id="form_buscar_paciente" class="btn btn-info" title="Buscar paciente"><i class="fa fa-search-plus"></i> Buscar Paciente</button>
                          </div>
                         </div>
                     </div>
                     
-                    <div class="row">                                                                         
+                    <div class="row">
+                        
                       <div class="col-md-2 col-sm-6">
-                         <div class="form-group">
-                          <label>Usuario</label>
-                            <div class='input-group'>
-                                <input readonly="" required="" type="text" class="form-control" id="usuario" placeholder="Usuario">
-                                <span class="input-group-addon glyphicon-disabled">
-                                    <span class="glyphicon glyphicon-user"></span>
-                                </span>                                
+                        <div class="form-group">
+                            <label>Fecha de Ingreso</label>
+                            <div class='input-group date'>
+                                <input type='text' data-date-format="YYYY-MM-DD HH:mm" placeholder="YYYY-MM-DD HH:mm" class="form-control" id="fechaRegistro" />
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
                             </div>
-                         </div>
-                      </div>
+                        </div>
+                      </div>                        
+
                       <div class="col-md-3 col-sm-6">
                         <div class="form-group">
                           <label>Paciente</label>
@@ -97,26 +99,7 @@ class TicketView extends Pagina{
                           </div>
                          </div>
                       </div>
-                      <div class="col-md-2 col-sm-6">
-                        <div class="form-group">
-                            <label>Fecha de Ingreso</label>
-                            <div class='input-group date fechaRegistro'>
-                                <input type='text' data-date-format="YYYY-MM-DD HH:mm" placeholder="Fecha ingreso" class="form-control" id="fechaRegistro" />
-                                <span class="input-group-addon">
-                                    <span class="glyphicon glyphicon-calendar"></span>
-                                </span>
-                            </div>
-                        </div>
-                          <script>
-                                $('#fechaRegistro').datetimepicker(); 
-
-                                $('#fechaRegistro input').click(function(){
-                                    $('#fechaRegistro').data("DateTimePicker").show();
-                                 });                           
-                                 
-                                 $('.fechaRegistro').datetimepicker();
-                          </script>
-                      </div>
+ 
                       <div class="col-md-2 col-sm-6">
                         <div class="form-group">
                           <label>Estado</label>
@@ -124,9 +107,12 @@ class TicketView extends Pagina{
                             <select id="estado_id" class="form-control">
                                 <?php 
                                     foreach ($data['estados'] as $estado){
+                                        //if($estado['estado_id']==4 && $estado['estado_id'])
+                                            {
                                         ?>
                                       <option value="<?php echo $estado['estado_id']?>"><?php echo $estado['descripcion']?></option>
                                         <?php
+                                        }
                                     }
                                 ?>
                             </select>
@@ -136,6 +122,17 @@ class TicketView extends Pagina{
                           </div>
                         </div>                                                    
                       </div>
+                      <div class="col-md-2 col-sm-6">
+                        <div class="form-group">
+                            <label>Fecha Aprobado</label>
+                            <div class='input-group date'>
+                                <input type='text' data-date-format="YYYY-MM-DD HH:mm" placeholder="YYYY-MM-DD HH:mm" class="form-control" id="fechaAprobado" />
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                        </div>
+                      </div>                           
                       <div class="col-md-3 col-sm-6">
                         <div class="form-group">
                           <label>N° Carta</label> 
@@ -173,9 +170,10 @@ class TicketView extends Pagina{
                              <label style="color:white"> . </label> 
                              <input type="hidden" name="IdAseguradora" id="IdAseguradora" value=""/> 
                              <input type="hidden" name="paciente" id="paciente" value="">
+                             <input type="hidden" id="usuario" value="<?php echo $dataUser['USUARIO']?>">
                              <input type="hidden" name="IdGarantia" id="IdGarantia" value="">
                              <br>
-                            <button type="submit" id="registrar" class="btn btn-primary btn-block"><i class="fa fa-h-square"></i>   Registrar</button>
+                             <button type="submit" id="registrar" class="btn btn-primary btn-block" title="Registrar carta de paciente"><i class="fa fa-h-square"></i> Registrar</button>
                          </div>
                         </div>                        
                     </div>                     

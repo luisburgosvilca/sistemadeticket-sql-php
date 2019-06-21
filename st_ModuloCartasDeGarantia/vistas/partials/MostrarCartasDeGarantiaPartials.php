@@ -1,6 +1,6 @@
 <?php
-
-class MostrarCartasDeGarantiaPartials{
+include_once('../st_ModuloSeguridad/vistas/Pagina.php');
+class MostrarCartasDeGarantiaPartials extends Pagina{
     
     function MostrarCartas($data){
     
@@ -76,8 +76,9 @@ class MostrarCartasDeGarantiaPartials{
                             ?>
                             <tr>
                               <td class="acciones" align='center'>
-                                                  
-                                  <button class="btn bg-orange btn-xs view_activo" id="btnEditPaciente"
+                                               
+<!--                                  <div class="btn-group">   -->
+                                  <button class="btn bg-orange btn-xs view_activo" id="btnEditPaciente" title="Editar"
                                     data-id="<?php echo $d['id']?>"
                                     data-paciente="<?php  echo $d['paciente']?>"
                                     data-nombrepaciente="<?php echo $d['nombrePaciente']?>"
@@ -85,12 +86,38 @@ class MostrarCartasDeGarantiaPartials{
                                     data-nrocarta="<?php echo $d['nrocarta']?>"
                                     data-estado_id="<?php echo $d['estado_id']?>"
                                     data-fecharegistro="<?php echo substr($d['fechaRegistro'],0,16)?>"
-                                    data-fechaAprobado="<?php echo $d['fechaAprobado']?>"
+                                    data-fechaaprobado="<?php echo $d['fechaAprobado']?>"
                                     data-estado="<?php echo htmlentities($estado)?>"
                                     data-tratamiento="<?php echo utf8_encode($d['tratamiento'])?>"
                                     data-esurgente="<?php echo $cadena = str_replace(' ', '', $d['esUrgente']);?>">                                      
                                       <i class="fa fa-edit"></i>
                                   </button>
+                                  <?php if($d['fechaAprobado']==""){
+                                      ?>
+<!--                                  <button class="btn btn-xs btn-success" id="btnAprobarCarta" title="Aprobar Carta"
+                                        data-id="<?php echo $d['id']?>"
+                                        data-nombrepaciente="<?php echo $d['nombrePaciente']?>">
+                                       <i class="fa fa-check-square-o"></i>
+                                  </button>        
+                                  <button class="btn btn-xs btn-danger" id="btnAprobarCarta" title="Observaciones en la carta"
+                                        data-id="<?php echo $d['id']?>"
+                                        data-nombrepaciente="<?php echo $d['nombrePaciente']?>">
+                                       <i class="glyphicon glyphicon-alert"></i>
+                                  </button>                                                                     -->
+                                          <?php
+                                  }else{
+                                      ?>
+<!--                                  <button class="btn bg-olive btn-xs" id="btnActualizarFechaAprobacion" title="Ajustar fecha de Actualización"
+                                        data-id="<?php echo $d['id']?>"
+                                        data-nombrepaciente="<?php echo $d['nombrePaciente']?>"
+                                        data-fechaaprobado="<?php echo $d['fechaAprobado']?>">
+                                        <i class="fa fa-history"></i>
+                                  </button>                                   -->
+                                          <?php
+                                  }
+                                  ?>
+                                  
+<!--                                </div>-->
 
                               </td>  
                               <td class="usuario">      <?php echo utf8_encode($d['usuario'])?></td>                             
@@ -100,23 +127,14 @@ class MostrarCartasDeGarantiaPartials{
                               <td class="fechaingreso"> <?php echo substr($d['fechaRegistro'],0,16)?></td>
                               <td class="estado">       <?php echo $estado?></td>               
                               <td class="fechaaprobado"><?php if($d['fechaAprobado']==""){
-                                  ?>
-                                   <button class="btn btn-xs btn-default btn-block" id="btnAprobarCarta"
-                                        data-id="<?php echo $d['id']?>"
-                                        data-nombrepaciente="<?php echo $d['nombrePaciente']?>">
-                                       Aprobar
-                                   </button>
-                                      <?php
+
                               }else{
                                   echo substr($d['fechaAprobado'],0,16);
-                                  
                               }?>
                               </td>
-                              <td class="tiempoaprobado">
-
-                              </td>
+                              <td class="tiempoaprobado"><?php echo ($d['tiempo_aprobacion']==NULL || $d['tiempo_aprobacion']<0)?'':$this->ObtenerTiempoDeAprobacion($d['tiempo_aprobacion'])?></td>
                               <td class="nrocarta">     <?php echo utf8_encode($d['nrocarta'])?></td>
-                              <td class="urgente text-red" align="center"><?php echo $icono = $cadena=='true'?'<span class="glyphicon glyphicon-alert"></span>':'' ?></td>
+                              <td class="urgente text-red" align="center"><?php echo $icono = $cadena=='true'?'<span class="fa fa-life-bouy"></span>':'' ?></td>
                             </tr>                    
                                 <?php
                         }                               
@@ -147,6 +165,8 @@ class MostrarCartasDeGarantiaPartials{
               
             </div>
             
+    
+    <!--1 //////////////////////////////////// Modal Edit ///////////////////////////////-->
             <div class="modal fade bs-example-modal-lg" id="modal-edit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                 <div class="modal-dialog ">
                 <div class="modal-content">  
@@ -171,7 +191,7 @@ class MostrarCartasDeGarantiaPartials{
                       <p class="text-muted" id="nombrePacienteModal">                
                       </p>
 
-                      <hr>
+<!--                      <hr>
 
                       <strong><i class="fa fa-ambulance margin-r-5"></i> Aseguradora</strong>
 
@@ -181,7 +201,7 @@ class MostrarCartasDeGarantiaPartials{
 
                       <strong><i class="fa fa-dashboard margin-r-5"></i> Estado de Carta</strong>
 
-                      <p id="estadoModal"></p>
+                      <p id="estadoModal"></p>-->
 
                     </div>
                     <!-- /.box-body -->
@@ -194,44 +214,14 @@ class MostrarCartasDeGarantiaPartials{
                 </div>                                
                 <div class="modal-body">
                     
-                    <form>   
-                        <div class="col-md-6 col-sm-6">
-                            <div class="form-group">
-                              <label>Estado</label>
-                              <div class='input-group'>
-                                <select id="new_estado_id" class="form-control">
-                                    <?php 
-                                        foreach ($data['estados'] as $estado){
+                    <form>  
 
-                                            ?>
-                                          <option value="<?php echo $estado['estado_id']?>"><?php echo $estado['descripcion']?></option>
-                                            <?php
-                                        }
-                                    ?>
-                                </select>
-                                <span class="input-group-addon">
-                                    <span class="glyphicon glyphicon-scale"></span>
-                                </span>                              
-                              </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6 col-sm-6">    
-                            <div class="form-group">
-                              <label>N° Carta</label> 
-                              <div class='input-group'>
-                                <input type="text" class="form-control" id="new_nrocarta" placeholder="N° Carta">
-                                <span class="input-group-addon">
-                                    <span class="glyphicon glyphicon-file"></span>
-                                </span>                             
-                              </div>
-                            </div>
-                        </div>                          
-
+                     
+                        
                         <div class="col-md-6 col-sm-6">
                           <div class="form-group">
                               <label>Fecha de Ingreso</label>
-                              <div class='input-group'>
+                              <div class='input-group date'>
                                   <input type='text' data-date-format="YYYY-MM-DD HH:mm" placeholder="Fecha ingreso" class="form-control" id="fechaIngresado" />
                                   <span class="input-group-addon">
                                       <span class="glyphicon glyphicon-calendar"></span>
@@ -243,14 +233,49 @@ class MostrarCartasDeGarantiaPartials{
                         <div class="col-md-6 col-sm-6">
                           <div class="form-group">
                               <label>Fecha de Aprobación</label>
-                              <div class='input-group'>
-                                  <input type='text' data-date-format="YYYY-MM-DD HH:mm" placeholder="Fecha ingreso" class="form-control" id="fechaAprobado" />
+                              <div class='input-group date'>
+                                  <input type='text' data-date-format="YYYY-MM-DD HH:mm" placeholder="YYYY-MM-DD HH:mm" class="form-control" id="fechaAprobado_edit" />
                                   <span class="input-group-addon">
                                       <span class="glyphicon glyphicon-calendar"></span>
                                   </span>
                               </div>
                           </div>
-                        </div>  
+                        </div>
+                        
+                        <div class="col-md-6 col-sm-6">
+                            <div class="form-group">
+                              <label>Estado</label>
+                              <div class='input-group'>
+                                <select id="new_estado_id" class="form-control">
+                                    <?php 
+                                        foreach ($data['estados'] as $estado){
+                                            //if($estado['estado_id']==4)
+                                                {
+                                            ?>
+                                    <option value="<?php echo $estado['estado_id']?>"><?php echo $estado['descripcion']?></option>
+                                            <?php                                            
+                                            }
+                                        }
+                                    ?>
+                                </select>
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-scale"></span>
+                                </span>                              
+                              </div>
+                            </div>
+                        </div>                          
+                        
+                        <div class="col-md-6 col-sm-6">    
+                            <div class="form-group">
+                              <label>N° Carta</label> 
+                              <div class='input-group'>
+                                <input type="text" class="form-control" id="new_nrocarta" placeholder="N° Carta">
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-file"></span>
+                                </span>                             
+                              </div>
+                            </div>
+                        </div>                          
 
                         <div class="col-md-6 col-sm-6">    
                             <div class="form-group">
@@ -291,7 +316,8 @@ class MostrarCartasDeGarantiaPartials{
               </div>
             </div>      
 
-            <div class="modal fade bs-example-modal-lg" id="modalAprobar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <!--2 //////////////////////////////////// Modal Aprobar ///////////////////////////////-->
+<!--            <div class="modal fade bs-example-modal-lg" id="modalAprobar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                 <div class="modal-dialog ">
                 <div class="modal-content">  
                 <div class="modal-header">
@@ -308,15 +334,15 @@ class MostrarCartasDeGarantiaPartials{
                     <div class="box-header with-border">
                       <h3 class="box-title">Paciente</h3>
                     </div>
-                    <!-- /.box-header -->
+                     /.box-header 
                     <div class="box-body">
                       <strong><i class="fa fa-user-plus margin-r-5"></i> Nombre</strong>
 
-                      <p class="text-muted" id="nombrePacienteModalUpdate">                
+                      <p class="text-muted" id="nombrePacienteModalUpdate2">                
                       </p>
 
                     </div>
-                    <!-- /.box-body -->
+                     /.box-body 
                   </div>           
                 </div>                  
 
@@ -336,15 +362,10 @@ class MostrarCartasDeGarantiaPartials{
                             </div>
                         </div>
                           <script>
-                                $('#fechaAprobacionModalUpdate').datetimepicker();
-                                var nuevoCSS = { "padding-bottom": '260px', "font-weight" : 'bold' };
-                                $('.fechaAprobacionModal').css(nuevoCSS);
-
-//                                $('#fechaAprobacionModal input').click(function(){
-//                                    $('#fechaAprobacionModal').data("DateTimePicker").show();
-//                                 });                           
-                                 
-                                 $('.fechaAprobacionModalUpdate').datetimepicker();
+                            //$('#fechaAprobacionModalUpdate').datetimepicker();
+                            var nuevoCSS = { "padding-bottom": '260px', "font-weight" : 'bold' };
+                            $('.fechaAprobacionModal').css(nuevoCSS);
+                            //$('.fechaAprobacionModalUpdate').datetimepicker();
                           </script>
 
                           
@@ -352,7 +373,7 @@ class MostrarCartasDeGarantiaPartials{
     
                     </form>          
                     
-                    <div id="resultadoActualizarFechaAprobacion"></div>
+                    <div id="resultadoActualizarFechaAprobacion2"></div>
                     
                 </div>
                     
@@ -363,22 +384,80 @@ class MostrarCartasDeGarantiaPartials{
                 </div>                                
                 </div>
               </div>
-            </div>   
+            </div>  -->
+    <!--            <div class="modal fade bs-example-modal-lg" id="modalCambiarFechaAprobado" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog ">
+                <div class="modal-content">  
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          
+                        <div class="col-xs-12 col-md-12">
+                            <div class="form-group">
+                                <h4 class="modal-title" id="gridSystemModalLabel"><u>Actualizar fecha de Aprobación</u></h4>    
+                            </div>
+                        </div>
+                <div class="col-xs-12 col-md-12">
+                  <div class="box box-primary">
+                    <div class="box-header with-border">
+                      <h3 class="box-title">Paciente</h3>
+                    </div>
+                     /.box-header 
+                    <div class="box-body">
+                      <strong><i class="fa fa-user-plus margin-r-5"></i> Nombre</strong>
+
+                      <p class="text-muted" id="nombrePacienteModalUpdate3">                
+                      </p>
+
+                    </div>
+                     /.box-body 
+                  </div>           
+                </div>                  
+
+                </div>                                
+                <div class="modal-body">
+                    
+                    <form>
+                        
+                      <div class="col-md-6 col-sm-8 col-sm-offset-2 col-md-offset-3">
+                        <div class="form-group">
+                            <label>Indicar fecha de aprobación</label>
+                            <div class='input-group date fechaAprobacionModal3'>
+                                <input type='text' data-date-format="YYYY-MM-DD HH:mm" placeholder="YYYY-MM-DD HH:mm" class="form-control" id="fechaAprobacionModalUpdate3" />
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>
+                          <script>
+                            //$('#fechaAprobacionModalUpdate3').datetimepicker();
+                            var nuevoCSS = { ".modal-body": '0px', "font-weight" : 'bold' };
+                            $('.modal-modal').css(nuevoCSS);
+                            //$('.fechaAprobacionModalUpdate3').datetimepicker();
+                          </script>                            
+                        </div>                          
+                      </div>
+    
+                    </form>          
+                    
+                    <div id="resultadoActualizarFechaAprobacion3"></div>
+                    
+                </div>
+                    
+                <div class="modal-footer">
+                    <input type="hidden" id="idRegistro" value="">
+                  <button type="button" class="btn btn-default fecha_update" data-dismiss="modal"><i class="fa fa-close"></i> Cerrar</button>
+                  <button type="button" class="btn btn-primary" id="btnActualizarFechaAprobadoCarta">Guardar</button>
+                </div>                                
+                </div>
+              </div>
+            </div>    -->
+    
+    <!--3 //////////////////////////////////// Modal modalCambiarFechaAprobado ///////////////////////////////-->
+
 
         <script>
             ///// Calendarios de PopUp
-            $('#fechaIngresado').datetimepicker();
-            $('#fechaAprobado').datetimepicker({
-                useCurrent: false //Important! See issue #1075
-            });
+            $('.date').datetimepicker();
 
-            $("#fechaIngresado").on("dp.change", function (e) {
-                $('#fechaAprobado').data("DateTimePicker").minDate(e.date);
-            });
-            $("#fechaAprobado").on("dp.change", function (e) {
-                $('#fechaIngresado').data("DateTimePicker").maxDate(e.date);
-            });
-            
             ///// 1. Ocultar / Mostrar Columnas
             $("input:checkbox:not(:checked)").each(function() {
                 var column = "table ." + $(this).attr("name");
@@ -419,15 +498,11 @@ class MostrarCartasDeGarantiaPartials{
                 var tratamiento     = $(this).data("tratamiento");
                 var esUrgente       = $(this).data("esurgente");
                 var check           = esUrgente==true?true:false;
-                //alert(fechaAprobado);
-
-//                $('body').on("click", ".view_activo", function(e) {
-//                  e.preventDefault();
-//                  $('#modal-edit').modal('show');
-//                });
+                
+                //  alert(fechaIngresado);
                 
                $('#modal-edit').modal('show');
-                  //alert(id);
+                  //alert(fechaAprobado);
                   $("#id_registro").val(id);
                   $("#nombrePacienteModal").html(nombrePaciente);
                   $("#aseguradoraModal").html(aseguradora);
@@ -435,23 +510,24 @@ class MostrarCartasDeGarantiaPartials{
                   $("#new_tratamiento").val(tratamiento);
                   $("#new_estado_id").val(estado_id);
                   $("#fechaIngresado").val(fechaIngresado);
-                  $("#fechaAprobado").val(fechaAprobado);
+                  $("#fechaAprobado_edit").val(fechaAprobado);
                   $("#estadoModal").html(estado);
-                  $("#new_es_urgente").prop("checked", check);                 
+                  $("#new_es_urgente").prop("checked", check);   
+                  //console.log(fechaAprobado);
                   
             });    
                         
           ///// 4. Guardar los datos  
-            $("#updateEstadoCarta").bind("click",function (){
-               var id = $("#id_registro").val(); 
+            $("#updateEstadoCarta").on("click",function (){
+               var id               = $("#id_registro").val(); 
                var new_nrocarta     = $("#new_nrocarta").val();
                var new_estadocarta  = $("#new_estadocarta").val();
                var new_estado_id    = $("#new_estado_id").val();
                var new_fecha_ingresado = $("#fechaIngresado").val();
-               var new_fecha_aprobado = $("#fechaAprobado").val();
+               var new_fecha_aprobado = $("#fechaAprobado_edit").val();
                var new_tratamiento  = $("#new_tratamiento").val();
                var new_es_urgente   = document.getElementById("new_es_urgente").checked;//$("#new_es_urgente").val();
-               //console.log(new_fecha_ingresado);
+               //alert(new_fecha_aprobado);
                
                 $("#resultado_actualizar_estado_carta_paciente").html("<center><img height='100%' class='img img-responsive center-block' src='../st_includes/img/loading.gif' /></center>");
                     $.ajax({
@@ -471,43 +547,78 @@ class MostrarCartasDeGarantiaPartials{
             });
             
             ///// 5. Aprobar Carta de Garantía
-            $('body').on("click", "button[id=btnAprobarCarta]", function(e) {
-                
-                var idRegistroAprobar = $(this).data("id");
-                var nombrePaciente      = $(this).data("nombrepaciente");
-                
-                $('#modalAprobar').modal("show");
-                    $("#registroAprobar").val(idRegistroAprobar);
-                    $("#nombrePacienteModalUpdate").html(nombrePaciente);                                               
-                    
-            });
+//            $('body').on("click", "button[id=btnAprobarCarta]", function(e) {
+//                
+//                var idRegistroAprobar = $(this).data("id");
+//                var nombrePaciente      = $(this).data("nombrepaciente");
+//                
+//                $('#modalAprobar').modal("show");
+//                    $("#registroAprobar").val(idRegistroAprobar);
+//                    $("#nombrePacienteModalUpdate2").html(nombrePaciente);                                               
+//                    
+//            });
+//            
+//            ///// 6. Actualizar fecha de aprobación de carta de Garantía
+//            
+//            $("#btnAprobarCartaUpdate").on("click", function(){
+//                var id              = $("#registroAprobar").val();
+//                var fechaAprobacion = $("#fechaAprobacionModalUpdate").val();
+//                
+//                //alert(fechaAprobacion);
+//                
+//                $("#resultadoActualizarFechaAprobacion").html("<center><img height='100%' class='img img-responsive center-block' src='../st_includes/img/loading.gif' /></center>");
+//                    $.ajax({
+//                        type:       'POST',
+//                        dataType:   'html',
+//                        url:        '../st_ModuloCartasDeGarantia/getCartas.php',
+//                        data:       {actualizarFechaAprobacion:'actualizarFechaAprobacion', id: id, fechaAprobacion: fechaAprobacion},
+//                        success: function(wait_for_confirmation){
+//                            $("#resultadoActualizarFechaAprobacion").html(wait_for_confirmation);
+//                            CargarCartasDeGarantia();                    
+//                            //$('#modal-backdrop').modal('hide');
+//                            $('.modal-backdrop').hide();
+//                           
+//                        }
+//                    });                 
+//                
+//                
+//            });
             
-            ///// 6. Actualizar fecha de aprobación de carta de Garantía
-            
-            $("#btnAprobarCartaUpdate").on("click", function(){
-                var id              = $("#registroAprobar").val();
-                var fechaAprobacion = $("#fechaAprobacionModalUpdate").val();
-                
-                //alert(fechaAprobacion);
-                
-                $("#resultadoActualizarFechaAprobacion").html("<center><img height='100%' class='img img-responsive center-block' src='../st_includes/img/loading.gif' /></center>");
-                    $.ajax({
-                        type:       'POST',
-                        dataType:   'html',
-                        url:        '../st_ModuloCartasDeGarantia/getCartas.php',
-                        data:       {actualizarFechaAprobacion:'actualizarFechaAprobacion', id: id, fechaAprobacion: fechaAprobacion},
-                        success: function(wait_for_confirmation){
-                            $("#resultadoActualizarFechaAprobacion").html(wait_for_confirmation);
-                            CargarCartasDeGarantia();                    
-                            //$('#modal-backdrop').modal('hide');
-                            $('.modal-backdrop').hide();
-                           
-                        }
-                    });                 
-                
-                
-            });
-            
+            ///// 7. Botón editar fecha de actualización
+//            $('body').on("click", "button[id=btnActualizarFechaAprobacion]", function(e) {
+//                
+//                var id              = $(this).data("id");
+//                var nombrePaciente  = $(this).data("nombrepaciente");
+//                var fecha           = $(this).data("fechaaprobado");                
+//                //console.log(nombrePaciente);
+//                $('#modalCambiarFechaAprobado').modal("show");
+//                    $("#idRegistro").val(id);
+//                    $("#nombrePacienteModalUpdate3").html(nombrePaciente);
+//                    $("#fechaAprobacionModalUpdate3").val(fecha);                                               
+//                    
+//            });
+//            
+//            $("#btnActualizarFechaAprobadoCarta").on("click",function(){
+//                    
+//                var id              = $("#idRegistro").val();
+//                var fechaAprobacion = $("#fechaAprobacionModalUpdate3").val();
+//                
+//                $("#resultadoActualizarFechaAprobacion3").html("<center><img height='100%' class='img img-responsive center-block' src='../st_includes/img/loading.gif' /></center>");
+//                    $.ajax({
+//                        type:       'POST',
+//                        dataType:   'html',
+//                        url:        '../st_ModuloCartasDeGarantia/getCartas.php',
+//                        data:       {actualizarFechaAprobacion3:'actualizarFechaAprobacion3', id: id, fechaAprobacion: fechaAprobacion},
+//                        success: function(wait_for_confirmation){
+//                            $("#resultadoActualizarFechaAprobacion3").html(wait_for_confirmation);
+//                            CargarCartasDeGarantia();                    
+//                            //$('#modal-backdrop').modal('hide');
+//                            $('.modal-backdrop').hide();
+//                           
+//                        }
+//                    });   
+//                
+//            });
           
         </script>
         

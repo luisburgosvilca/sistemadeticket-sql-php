@@ -3,24 +3,31 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/xampp/htdocs/SystemTicket/st_includes/js/CartasView.js</file>
-            <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloSeguridad/entidades/UsuarioTicket.php</file>
-            <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloCartasDeGarantia/vistas/partials/_MostrarEditarCartaPartials.php</file>
+            <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloTicket/vistas/FormularioNuevoTicketView.php</file>
+            <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloPublicaciones/controles/PublicacionesController.php</file>
+            <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloPublicaciones/vistas/FormularioNuevaPublicacion.php</file>
             <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloTicket/entidades/TicketEntity.php</file>
-            <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloCartasDeGarantia/vistas/partials/LlenarFormularioDeRegistroPartials.php</file>
-            <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloCartasDeGarantia/vistas/partials/MostrarCartasDeGarantiaPartials.php</file>
             <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloSeguridad/vistas/Pagina.php</file>
+            <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloTicket/vistas/TicketView.php</file>
             <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloCartasDeGarantia/controles/CartasController.php</file>
             <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloCartasDeGarantia/getCartas.php</file>
+            <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloPublicaciones/vistas/PublicacionesView.php</file>
+            <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloCartasDeGarantia/index.php</file>
+            <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloPublicaciones/entidades/PublicacionEntity.php</file>
+            <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloCartasDeGarantia/vistas/partials/MostrarCartasDeGarantiaDePacientePartials.php</file>
+            <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloPublicaciones/getPublicaciones.php</file>
+            <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloTicket/vistas/partials/PartialsMostrarTickets.php</file>
+            <file>file:/C:/xampp/htdocs/SystemTicket/st_includes/js/CartasView.js</file>
+            <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloCartasDeGarantia/vistas/partials/MostrarCartasDeGarantiaPartials.php</file>
+            <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloCartasDeGarantia/vistas/partials/LlenarFormularioDeRegistroPartials.php</file>
+            <file>file:/C:/xampp/htdocs/SystemTicket/st_includes/js/PublicacionesView.js</file>
+            <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloPublicaciones/vistas/partials/MostrarPublicacionesPartials.php</file>
             <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloCartasDeGarantia/vistas/partials/MostrarResultadoBusquedaPartials.php</file>
-            <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloSeguridad/getSecurity.php</file>
             <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloCartasDeGarantia/entidades/CartaEntity.php</file>
-            <file>file:/C:/xampp/htdocs/SystemTicket/fechahora3.php</file>
+            <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloTicket/controles/TicketController.php</file>
+            <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloPublicaciones/index.php</file>
             <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloCartasDeGarantia/vistas/CartasView.php</file>
             <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloSeguridad/controles/RecursosController.php</file>
-            <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloSeguridad/vistas/Dashboard.php</file>
-            <file>file:/C:/xampp/htdocs/SystemTicket/fechaHora2.php</file>
-            <file>file:/C:/xampp/htdocs/SystemTicket/st_ModuloCartasDeGarantia/vistas/partials/MostrarCartasDeGarantiaDePacientePartials.php</file>
         </group>
     </open-files>
 </project-private>

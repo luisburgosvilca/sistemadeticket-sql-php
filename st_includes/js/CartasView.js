@@ -1,5 +1,6 @@
             $(document).ready(function(){
                 
+
                 ///// 1. Cargar Cartas de Garantía registradas
                 CargarCartasDeGarantia(); 
                 
@@ -10,6 +11,7 @@
                         nombrePaciente  = $("#nombrePaciente").val();
                         aseguradora     = $("#aseguradora").val();
                         fechaRegistro   = $("#fechaRegistro").val();
+                        fechaAprobado   = $("#fechaAprobado").val();       
                         estado_id       = $("#estado_id").val();
                         nrocarta        = $("#nrocarta").val();
                         tratamiento     = $("#tratamiento").val();
@@ -24,7 +26,7 @@
                         IdGarantia      = $("#IdGarantia").val();
                         
                         //console.log(IdAseguradora);
-                        //alert(esUrgente);
+                        //alert(fechaAprobado);
 
                         if(usuario=='' || nombrePaciente=='' || aseguradora==''){
                             alert('Debe buscar un paciente con carta de garantía');
@@ -35,7 +37,7 @@
                                     type:       'POST',
                                     dataType:   'html',
                                     url:        '../st_ModuloCartasDeGarantia/getCartas.php',
-                                    data:       {registrar_carta:'registrar_carta', usuario: usuario, paciente:paciente, nombrePaciente:nombrePaciente, IdAseguradora:IdAseguradora,aseguradora:aseguradora, fechaRegistro:fechaRegistro, estado_id: estado_id, nrocarta:nrocarta, tratamiento:tratamiento, esUrgente:esUrgente, IdGarantia:IdGarantia},
+                                    data:       {registrar_carta:'registrar_carta', usuario: usuario, paciente:paciente, nombrePaciente:nombrePaciente, IdAseguradora:IdAseguradora,aseguradora:aseguradora, fechaRegistro:fechaRegistro,fechaAprobado:fechaAprobado, estado_id: estado_id, nrocarta:nrocarta, tratamiento:tratamiento, esUrgente:esUrgente, IdGarantia:IdGarantia},
                                     success: function(wait_for_confirmation){
                                         $("#CartasDeGarantia").html(wait_for_confirmation);
                                     }
@@ -78,6 +80,7 @@
 
                 
             });
+                 
             
                 function CargarCartasDeGarantia(){
                     //console.log(1);
@@ -86,7 +89,7 @@
                         
                 function LimpiarCampos(){
 
-                    document.getElementById("usuario").value="";
+                    //document.getElementById("usuario").value="";
                     document.getElementById("paciente").value="";
                     document.getElementById("nombrePaciente").value="";
                     document.getElementById("IdAseguradora").value="";
