@@ -24,7 +24,7 @@ class CartasController extends RecursosController{
             $data['nrocarta']       = $_POST['nrocarta'];
             $data['tratamiento']    = $_POST['tratamiento'];
             $data['esUrgente']      = $_POST['esUrgente'];
-            $data['IdGarantia']     = $_POST['IdGarantia'];
+            $data['CodigoOA']     = $_POST['CodigoOA'];
         
         if($cartaEntity->Registrar($data)){
             //echo "Registrado";
@@ -76,7 +76,7 @@ class CartasController extends RecursosController{
         include_once('../st_ModuloCartasDeGarantia/entidades/CartaEntity.php');
         $cartaEntity = new CartaEntity();   
         
-        $data = $cartaEntity ->BuscarPaciente(addslashes($_POST['nombre']), $dataUser);
+        $data = $cartaEntity ->BuscarPaciente(addslashes(trim($_POST['nombre'])), $dataUser);
 
         include_once('../st_ModuloCartasDeGarantia/vistas/partials/MostrarResultadoBusquedaPartials.php');
         $MostrarResultadoBusquedaPartials = new MostrarResultadoBusquedaPartials();
@@ -109,7 +109,7 @@ class CartasController extends RecursosController{
         $data['aseguradora']    = $_REQUEST['aseguradora'];
         $data['nombrePaciente'] = $_REQUEST['nombrePaciente'];
         $data['paciente']       = $_REQUEST['paciente'];
-        $data['IdGarantia']     = $_REQUEST['IdGarantia'];
+        $data['CodigoOA']     = $_REQUEST['CodigoOA'];
         $data['fechaRegistro']  = $_REQUEST['fecha'];
         
         include_once('../st_ModuloCartasDeGarantia/vistas/partials/LlenarFormularioDeRegistroPartials.php');

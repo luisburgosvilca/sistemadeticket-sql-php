@@ -23,14 +23,14 @@ class CartaEntity extends Conexion{
             $nrocarta       = $data['nrocarta'];    
             $tratamiento    = $data['tratamiento'];
             $esUrgente      = $data['esUrgente'];
-            $IdGarantia     = $data['IdGarantia'];
+            $CodigoOA     = $data['CodigoOA'];
 
             if($fechaAprobado==NULL){
-                $query = "INSERT INTO st_carta (usuario,paciente,nombrePaciente,IdEmpresaAseguradora,aseguradora,fechaRegistro,fechaAprobado,estado_id,nrocarta,tratamiento, esUrgente, IdGarantia,fecha) VALUES 
-                    ('$usuario','$paciente','$nombrePaciente','$IdEmpresaAseguradora','$aseguradora','$fechaRegistro',NULL,'$estado_id','$nrocarta','$tratamiento','$esUrgente','$IdGarantia',GETDATE())";                
+                $query = "INSERT INTO st_carta (usuario,paciente,nombrePaciente,IdEmpresaAseguradora,aseguradora,fechaRegistro,fechaAprobado,estado_id,nrocarta,tratamiento, esUrgente, CodigoOA,fecha) VALUES 
+                    ('$usuario','$paciente','$nombrePaciente','$IdEmpresaAseguradora','$aseguradora','$fechaRegistro',NULL,'$estado_id','$nrocarta','$tratamiento','$esUrgente','$CodigoOA',GETDATE())";                
             }else{
-                $query = "INSERT INTO st_carta (usuario,paciente,nombrePaciente,IdEmpresaAseguradora,aseguradora,fechaRegistro,fechaAprobado,estado_id,nrocarta,tratamiento, esUrgente, IdGarantia,fecha) VALUES 
-                    ('$usuario','$paciente','$nombrePaciente','$IdEmpresaAseguradora','$aseguradora','$fechaRegistro','$fechaAprobado','$estado_id','$nrocarta','$tratamiento','$esUrgente','$IdGarantia',GETDATE())";                
+                $query = "INSERT INTO st_carta (usuario,paciente,nombrePaciente,IdEmpresaAseguradora,aseguradora,fechaRegistro,fechaAprobado,estado_id,nrocarta,tratamiento, esUrgente, CodigoOA,fecha) VALUES 
+                    ('$usuario','$paciente','$nombrePaciente','$IdEmpresaAseguradora','$aseguradora','$fechaRegistro','$fechaAprobado','$estado_id','$nrocarta','$tratamiento','$esUrgente','$CodigoOA',GETDATE())";                
             }
             //echo $query;
             $result = sqlsrv_query($conn,$query) or die('Error x1: CartaEntity');
@@ -50,7 +50,8 @@ class CartaEntity extends Conexion{
                             inner join [ONCO].[SYS_ESTADO_REGISTRO] ER on C.estado_id=ER.ESTADO_REGISTRO
                             inner JOIN Spring_Produccion.dbo.PersonaMast A ON A.Persona = C.IdEmpresaAseguradora
                             inner JOIN Spring_Produccion.dbo.PersonaMast P ON P.Persona = C.paciente
-                                order by C.fecha desc";
+                                WHERE ESTADO_REGISTRO IN ('$this->estado')
+                                    order by C.fecha desc";
             $result = sqlsrv_query($conn,$query, array(), array('Scrollable' => 'buffered')) or die('Error x2: ');
             
             //var_dump(($result));
@@ -60,8 +61,8 @@ class CartaEntity extends Conexion{
             while($carta = sqlsrv_fetch_array($result)){
                 $data[$i]['id']             = $carta['id'];
                 $data[$i]['usuario']        = $carta['usuario'];
-                $data[$i]['paciente']       = utf8_encode($carta['paciente']);
-                $data[$i]['nombrePaciente'] = utf8_encode($carta['nombre_paciente']) ;
+                $data[$i]['paciente']       = $carta['paciente'];
+                $data[$i]['nombrePaciente'] = ($carta['nombre_paciente']) ;
                 $data[$i]['IdEmpresaAseguradora']  = utf8_decode($carta['IdEmpresaAseguradora']);
                 $data[$i]['aseguradora']    = ($carta['nombre_aseguradora']);
                 $data[$i]['tratamiento']    = utf8_decode($carta['tratamiento']);
@@ -118,27 +119,42 @@ class CartaEntity extends Conexion{
     function BuscarCartasDePaciente($persona){
         $conn = $this->AbrirConexion();
         
-            $query = "SELECT
-                        IdGarantia,
-                        G.FechaInicioGarantia,
-                        IdEmpresaAseguradora,
-                        A.NombreCompleto as aseguradora,
-                        G.EstadoDocumento
-                            FROM Spring_Produccion.dbo.SS_AD_Garantia G
-                                left JOIN Spring_Produccion.dbo.PersonaMast P
-                                        ON P.Persona = G.IdPaciente
-                                left JOIN Spring_Produccion.dbo.PersonaMast A
-                                        ON A.Persona = G.IdEmpresaAseguradora
-                                        where P.Persona ='$persona' 
-                                        order by G.FechaInicioGarantia DESC";
+//            $query = "SELECT
+//                        IdGarantia,
+//                        G.FechaInicioGarantia,
+//                        IdEmpresaAseguradora,
+//                        A.NombreCompleto as aseguradora,
+//                        G.EstadoDocumento
+//                            FROM Spring_Produccion.dbo.SS_AD_Garantia G
+//                                left JOIN Spring_Produccion.dbo.PersonaMast P
+//                                        ON P.Persona = G.IdPaciente
+//                                left JOIN Spring_Produccion.dbo.PersonaMast A
+//                                        ON A.Persona = G.IdEmpresaAseguradora
+//                                        where P.Persona ='$persona' 
+//                                        order by G.FechaInicioGarantia DESC";
+        $query="SELECT
+                    OA.CodigoOA,
+                    OA.FechaInicio,
+                    OA.FechaFinal,
+                    IdEmpresaAseguradora,
+                    A.NombreCompleto as aseguradora,
+                    OA.EstadoDocumento
+                        FROM Spring_Produccion.dbo.SS_AD_OrdenAtencion OA 
+                            left JOIN Spring_Produccion.dbo.PersonaMast P
+                                ON P.Persona = OA.IdPaciente
+                            left JOIN Spring_Produccion.dbo.PersonaMast A
+                                ON A.Persona = OA.IdEmpresaAseguradora
+                                    where P.Persona ='$persona' 
+                                        order by OA.FechaInicio DESC";
             $result = sqlsrv_query($conn,$query, array(), array('Scrollable' => 'buffered')) or die('Error x4: ');
             
             //echo '->'.var_dump(sqlsrv_num_rows($result)).'<-';
             if(sqlsrv_num_rows($result)>0){
                 $i=0;
                 while($carta = sqlsrv_fetch_array($result)){
-                    $data[$i]['IdGarantia']             = $carta['IdGarantia'];              
-                    $data[$i]['FechaInicioGarantia']    = is_null($carta['FechaInicioGarantia'])? '': date_format($carta['FechaInicioGarantia'],"Y-m-d");
+                    $data[$i]['CodigoOA']             = $carta['CodigoOA'];              
+                    $data[$i]['FechaInicio']    = is_null($carta['FechaInicio'])? '': date_format($carta['FechaInicio'],"Y-m-d");
+                    $data[$i]['FechaFinal']    = is_null($carta['FechaFinal'])? '': date_format($carta['FechaFinal'],"Y-m-d");
                     $data[$i]['IdEmpresaAseguradora']   = ($carta['IdEmpresaAseguradora']);
                     $data[$i]['aseguradora']            = ($carta['aseguradora']);
                     $i++;                 

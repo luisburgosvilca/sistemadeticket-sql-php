@@ -9,7 +9,7 @@ class LlenarFormularioDeRegistroPartials{
             'aseguradora'   => $data['aseguradora'],
             'nombrePaciente'=> $data['nombrePaciente'],
             'paciente'      => $data['paciente'],
-            'IdGarantia'    => $data['IdGarantia'],
+            'CodigoOA'    => $data['CodigoOA'],
             'fechaRegistro' => $data['fechaRegistro'],
             'usuario'       => $dataUser['USUARIO']
         );

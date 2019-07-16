@@ -121,7 +121,7 @@ class MostrarCartasDeGarantiaPartials extends Pagina{
 
                               </td>  
                               <td class="usuario">      <?php echo utf8_encode($d['usuario'])?></td>                             
-                              <td class="paciente">     <?php echo utf8_encode($d['nombrePaciente'])?></td>                              
+                              <td class="paciente">     <?php echo $d['nombrePaciente']?></td>                              
                               <td class="aseguradora">  <?php echo ($d['aseguradora'])?></td>    
                               <td class="tratamiento">  <?php echo utf8_encode($d['tratamiento'])?></td>    
                               <td class="fechaingreso"> <?php echo substr($d['fechaRegistro'],0,16)?></td>

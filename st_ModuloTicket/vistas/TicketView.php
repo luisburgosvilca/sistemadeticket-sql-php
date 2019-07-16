@@ -34,10 +34,10 @@ class TicketView extends Pagina{
                    $("#tickets").load("../st_Moduloticket/getTicket.php",{'mostrar_tickets': 'mostrar_tickets',usuario_id:usuario_id,'t':t});
                 }
                 
-                    var intercal = setInterval(function()
-                    {
-                     CargarTickets();
-                    },10000);                 
+//                    var intercal = setInterval(function()
+//                    {
+//                     CargarTickets();
+//                    },10000);                 
             });
         </script>            
         <?php        

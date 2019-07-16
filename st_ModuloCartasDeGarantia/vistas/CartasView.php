@@ -171,7 +171,7 @@ class TicketView extends Pagina{
                              <input type="hidden" name="IdAseguradora" id="IdAseguradora" value=""/> 
                              <input type="hidden" name="paciente" id="paciente" value="">
                              <input type="hidden" id="usuario" value="<?php echo $dataUser['USUARIO']?>">
-                             <input type="hidden" name="IdGarantia" id="IdGarantia" value="">
+                             <input type="hidden" name="CodigoOA" id="CodigoOA" value="">
                              <br>
                              <button type="submit" id="registrar" class="btn btn-primary btn-block" title="Registrar carta de paciente"><i class="fa fa-h-square"></i> Registrar</button>
                          </div>

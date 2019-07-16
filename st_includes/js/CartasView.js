@@ -11,7 +11,7 @@
                         nombrePaciente  = $("#nombrePaciente").val();
                         aseguradora     = $("#aseguradora").val();
                         fechaRegistro   = $("#fechaRegistro").val();
-                        fechaAprobado   = $("#fechaAprobado").val();       
+                        fechaAprobado   = $("#fechaAprobado").val();
                         estado_id       = $("#estado_id").val();
                         nrocarta        = $("#nrocarta").val();
                         tratamiento     = $("#tratamiento").val();
@@ -23,7 +23,7 @@
                         
                         IdAseguradora   = $("#IdAseguradora").val();
                         paciente        = $("#paciente").val();
-                        IdGarantia      = $("#IdGarantia").val();
+                        CodigoOA      = $("#CodigoOA").val();
                         
                         //console.log(IdAseguradora);
                         //alert(fechaAprobado);
@@ -37,7 +37,7 @@
                                     type:       'POST',
                                     dataType:   'html',
                                     url:        '../st_ModuloCartasDeGarantia/getCartas.php',
-                                    data:       {registrar_carta:'registrar_carta', usuario: usuario, paciente:paciente, nombrePaciente:nombrePaciente, IdAseguradora:IdAseguradora,aseguradora:aseguradora, fechaRegistro:fechaRegistro,fechaAprobado:fechaAprobado, estado_id: estado_id, nrocarta:nrocarta, tratamiento:tratamiento, esUrgente:esUrgente, IdGarantia:IdGarantia},
+                                    data:       {registrar_carta:'registrar_carta', usuario: usuario, paciente:paciente, nombrePaciente:nombrePaciente, IdAseguradora:IdAseguradora,aseguradora:aseguradora, fechaRegistro:fechaRegistro,fechaAprobado:fechaAprobado, estado_id: estado_id, nrocarta:nrocarta, tratamiento:tratamiento, esUrgente:esUrgente, CodigoOA:CodigoOA},
                                     success: function(wait_for_confirmation){
                                         $("#CartasDeGarantia").html(wait_for_confirmation);
                                     }
@@ -97,7 +97,7 @@
                     document.getElementById("fechaRegistro").value="";
                     document.getElementById("estado_id").value="8";
                     document.getElementById("nrocarta").value="";
-                    document.getElementById("IdGarantia").value="";
+                    document.getElementById("CodigoOA").value="";
 
                 }                
                 
